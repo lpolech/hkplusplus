@@ -7,23 +7,39 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Stack;
 
 import javax.imageio.ImageIO;
 
 import utils.Constans;
-import utils.MoorePenrosePseudoinverse;
 import utils.Utils;
 import algorithms.AlgEnum;
 import algorithms.Algorithm;
 import algorithms.EM;
 import algorithms.Kmeans;
+import basic_hierarchy.implementation.BasicHierarchy;
+import basic_hierarchy.implementation.BasicInstance;
+import basic_hierarchy.implementation.BasicNode;
+import basic_hierarchy.interfaces.Hierarchy;
+import basic_hierarchy.interfaces.Instance;
+import basic_hierarchy.interfaces.Node;
 import center.method.Centroid;
 import data.Cluster;
 import data.Data;
+import data.DataPoint;
+import data.DataStatistics;
 import data.Parameters;
 import distance.measures.GMMBayesMLE;
 import distance.measures.L2Norm;
+import external_measures.AdaptedFmeasure;
+import external_measures.PartialOrderFmeasure;
+import external_measures.StandardFmeasure;
 
 public class Dendrogram {
 	private Data points;
@@ -34,6 +50,11 @@ public class Dendrogram {
 	private Path summaryStatisticsFile;
 	private Path compactSummaryStaticticsFile;
 	private int currentNumberOfNodes;
+	private AdaptedFmeasure adaptedFmeasureWithInheritance;
+	private AdaptedFmeasure adaptedFmeasureWithOUTInheritance;
+	private StandardFmeasure standardFmeasure;
+	private PartialOrderFmeasure partialOrderFscore;
+	public String dane;
 	
 	public Dendrogram(Data points, AlgEnum clusterisationMethod, int k, int levelsLimit, 
 			Path levelsImgsStorage)
@@ -42,6 +63,11 @@ public class Dendrogram {
 		this.k = k;
 		this.levelsLimit = levelsLimit;
 		this.levelsResultsStorage = levelsImgsStorage;
+		this.adaptedFmeasureWithInheritance = new AdaptedFmeasure(true);//boolean instancesInheritance, boolean imitateFlatClustering
+		this.adaptedFmeasureWithOUTInheritance = new AdaptedFmeasure(false);//boolean instancesInheritance, boolean imitateFlatClustering
+		this.standardFmeasure = new StandardFmeasure();
+		this.partialOrderFscore = new PartialOrderFmeasure();
+		
 		dendrogram = new ArrayList<DendrogramLevel>();
 		setClusterisationAlgorithm(clusterisationMethod);
 		createSummaryStatisticsFile();
@@ -69,18 +95,25 @@ public class Dendrogram {
 	{
 		try (FileWriter result = new FileWriter(summaryStatisticsFile.toString(), true)) 
 		{
-			result.write("Dataset" + Constans.delimiter + "Num. of Clusters" + Constans.delimiter + "Num. of Alg. Iterations (n)" + Constans.delimiter + "Num. of Alg. Repeats (r)" 
-					+ Constans.delimiter + "Max Dendrogram Size (s)" + Constans.delimiter + "Epsilon" + Constans.delimiter + "Little Value" + Constans.delimiter 
-					+ "Resp. Scal. Fact." + Constans.delimiter 
-					+ "Clusterisation Method" + Constans.delimiter + "Output" + Constans.delimiter + "Dimension File" + Constans.delimiter + "Verbose" + Constans.delimiter
-					+ "Use static center\n");
+			result.write("Dataset" + Constans.delimiter + "Num. of Clusters" + Constans.delimiter + "Num. of Alg. Iterations (n)" 
+					+ Constans.delimiter + "Num. of Alg. Repeats (r)" + Constans.delimiter + "Max Dendrogram Size (s)" + Constans.delimiter 
+					+ "Epsilon" + Constans.delimiter + "Little Value" + Constans.delimiter + "Resp. Scal. Fact. (rf)" + Constans.delimiter 
+					+ "Covar. Scal. Fact. (cf)" + Constans.delimiter + "Clusterisation Method" + Constans.delimiter + "Output" 
+					+ Constans.delimiter + "Dimension File" + Constans.delimiter + "Verbose" + Constans.delimiter + "Use static center" 
+					+ Constans.delimiter + "Adapt. Static Cen. Cov. Matrix" + Constans.delimiter + "Scalling Static Cen. Cov. Matrix"
+					+ Constans.delimiter + "Scalling Static Cen. Resp. Value" + Constans.delimiter + "Diagonal matrix" + Constans.delimiter
+					+ "Reestimate clusters\n");
 			
 			result.write(Parameters.getInputDataFilePath() + Constans.delimiter + Parameters.getK() + Constans.delimiter + Parameters.getNumberOfClusterisationAlgIterations()
 					+ Constans.delimiter + Parameters.getNumberOfClusterisationAlgRepeats()	+ Constans.delimiter + Parameters.getDendrogramMaxHeight() 
-					+ Constans.delimiter + Parameters.getEpsilon() + Constans.delimiter + Parameters.getLittleValue() + Constans.delimiter + Parameters.getResponsibilityScallingFactor()
-					+ Constans.delimiter + Parameters.getMethod() 
-					+ Constans.delimiter + Parameters.getOutputFolder() + Constans.delimiter + Parameters.getDimensionsNamesFilePath() + Constans.delimiter
-					+ (Parameters.isVerbose()? "true" : "false") + Constans.delimiter + (Parameters.isDisableStaticCenter()? "false" : "true") + "\n");
+					+ Constans.delimiter + Parameters.getEpsilon() + Constans.delimiter + Parameters.getLittleValue() + Constans.delimiter 
+					+ Parameters.getResponsibilityScallingFactor() + Constans.delimiter + Parameters.getCovarianceScallingFactor()
+					+ Constans.delimiter + Parameters.getMethod() + Constans.delimiter + Parameters.getOutputFolder() + Constans.delimiter 
+					+ Parameters.getDimensionsNamesFilePath() + Constans.delimiter + (Parameters.isVerbose()? "true" : "false") 
+					+ Constans.delimiter + (Parameters.isDisableStaticCenter()? "false" : "true") + Constans.delimiter 
+					+ Parameters.isStaticCenterAdaptiveCovarianve() + Constans.delimiter + Parameters.isStaticCenterCovarianceScalling()
+					+ Constans.delimiter + Parameters.isStaticCenterResponsibilityScalling() + Constans.delimiter 
+					+ Parameters.isDiagonalCovarianceMatrix() + Constans.delimiter + Parameters.isClusterReestimationBasedOnItsData() + "\n");
 			result.write("Clust. Level" + Constans.delimiter + DendrogramLevel.getMeasure().printClusterisationStatisticName() 
 					+ Constans.delimiter + "Flat FMeasure" + Constans.delimiter + "Incremental hierarch. FMeasure" + "\n");
 		} 
@@ -92,11 +125,17 @@ public class Dendrogram {
 	private void writeHeaderInCompactSummaryFile() {
 		try (FileWriter result = new FileWriter(compactSummaryStaticticsFile.toString(), true)) 
 		{
-			result.write("Dataset" + Constans.delimiter + "Number of Levels" + Constans.delimiter + "Statistic Value" + Constans.delimiter + "FMeasure"
+			result.write("Dataset" + Constans.delimiter + "Number of Levels" + Constans.delimiter + "Statistic Value" + Constans.delimiter + "FMeasure (first attempt)"
+					+ Constans.delimiter + "PO Fmeasure" + Constans.delimiter + "Standard FMeasure" + Constans.delimiter + "Adapted WITH inheritance FMeasure"
+					+ Constans.delimiter + "Adapted WITHOUT inheritance FMeasure"
 					+ Constans.delimiter + "Num. of Max. Clusters" + Constans.delimiter + "Num. of Max. Alg. Iterations (n)" + Constans.delimiter 
-					+ "Num. of Max. Alg. Repeats (r)" + Constans.delimiter + "Max Dendrogram Size (s)" + Constans.delimiter + "Max. number of nodes (w)" + Constans.delimiter
-					+ "Epsilon" + Constans.delimiter + "Little Value" + Constans.delimiter + "Resp. Scal. Fact." + Constans.delimiter + "Clusterisation Method" + Constans.delimiter + "Output" + Constans.delimiter + "Dimension File" 
-					+ Constans.delimiter + "Verbose" + Constans.delimiter + "Use static center" + Constans.delimiter +  "Eclapsed Time [min]\n");
+					+ "Num. of Max. Alg. Repeats (r)" + Constans.delimiter + "Max Dendrogram Size (s)" + Constans.delimiter + "Max. number of nodes (w)" 
+					+ Constans.delimiter + "Epsilon" + Constans.delimiter + "Little Value" + Constans.delimiter + "Resp. Scal. Fact. (rf)"
+					+ Constans.delimiter + "Covar. Scal. Fact. (cf)" + Constans.delimiter + "Clusterisation Method" + Constans.delimiter 
+					+ "Output" + Constans.delimiter + "Dimension File" + Constans.delimiter + "Verbose" + Constans.delimiter + "Use static center" 
+					+ Constans.delimiter + "Adapt. Static Cen. Cov. Matrix" + Constans.delimiter + "Scalling Static Cen. Cov. Matrix"
+					+ Constans.delimiter + "Scalling Static Cen. Resp. Value" + Constans.delimiter + "Diagonal matrix" + Constans.delimiter 
+					+ "Reestimate clusters" + Constans.delimiter + "Eclapsed Time [min]\n");
 		} 
 		catch (IOException e) {
 			System.out.println("Dendrogram.FileWriter" + e);
@@ -127,7 +166,6 @@ public class Dendrogram {
 			Cluster.setAlgorithm(clusterisationAlgorithm);
 			DendrogramLevel.setDistanceMethod(new EM());
 			DendrogramLevel.setMeasure(new GMMBayesMLE());
-			MoorePenrosePseudoinverse.updateMacheps();
 			break;
 		}
 	}
@@ -136,51 +174,80 @@ public class Dendrogram {
 		DendrogramLevel root = new DendrogramLevel(0, points.getDataStats());
 		root.makeRoot(points);
 		dendrogram.add(root);
-		computeDendrogramStatistics();
-		saveClusterisationResults(root, 0);
+		computeDendrogramStatistics(root);
+		saveClusterisationResults(root, 0, points.getDataStats());
 	}
 
 	public ArrayList<DendrogramLevel> run()
 	{
 		Utils.startTimer();
 		
-		int levelNumber = 1;//0 - korzen tworzony w konstruktorze
+		int levelNumber = 1;//0 - root is created in the constructor
 		while(!shouldTerminate(levelNumber))
 		{
 			System.out.println("Working on level " + levelNumber + "... ");
 			DendrogramLevel newLevel = getDendrogramBottom().expandTree(k, levelNumber, points.getDataStats(), currentNumberOfNodes);
 			dendrogram.add(newLevel);
-			computeDendrogramStatistics();
-			saveClusterisationResults(newLevel, levelNumber);
+			computeDendrogramStatistics(newLevel);
+			saveClusterisationResults(newLevel, levelNumber, points.getDataStats());
 			levelNumber++;
 			System.out.println("Done.");
 		}
 		
 		Utils.stopTimer();
 		
-		saveCompactSummaryStatistics(dendrogram.get(dendrogram.size()-1), levelNumber, Utils.getTimerInMinutes());
+		System.out.print("Computing final statistics... ");
+		computeFinalResultStatistics(getDendrogramBottom());
+		saveCompactSummaryStatistics(getDendrogramBottom(), levelNumber, Utils.getTimerInMinutes());
+		System.out.println("Done.");
 		return dendrogram;
 	}
 	
-	private void computeDendrogramStatistics() {
-		getDendrogramBottom().getClusterisationStatistics().setIncrementalHierarchicalFMeasure(calculateFMeasure());
+	private void computeFinalResultStatistics(DendrogramLevel dendrogramBottom) {
+		double adaptedFmeasureWithInheritanceValue = Double.NaN;
+		double adaptedFmeasureWithOUTInheritanceValue = Double.NaN;
+		double standardFmeasureValue = Double.NaN;
+		double partialOrderFscoreValue = Double.NaN;
 		
+		if(Parameters.isClassAttribute())
+		{
+			Hierarchy h = getHierarchyRepresentation();
+			adaptedFmeasureWithInheritanceValue = adaptedFmeasureWithInheritance.getMeasure(h);
+			adaptedFmeasureWithOUTInheritanceValue = adaptedFmeasureWithOUTInheritance.getMeasure(h);
+			standardFmeasureValue = standardFmeasure.getMeasure(h);
+			partialOrderFscoreValue = partialOrderFscore.getMeasure(h);	
+		}
+		
+		dendrogramBottom.getClusterisationStatistics().setAdaptedFmeasureWithInheritance(adaptedFmeasureWithInheritanceValue);
+		dendrogramBottom.getClusterisationStatistics().setAdaptedFmeasureWithOUTInheritance(adaptedFmeasureWithOUTInheritanceValue);
+		dendrogramBottom.getClusterisationStatistics().setStandardFmeasure(standardFmeasureValue);
+		dendrogramBottom.getClusterisationStatistics().setPartialOrderFscore(partialOrderFscoreValue);
 	}
 
-	private void saveClusterisationResults(DendrogramLevel newLevel, int levelNumber) {
-		saveClusterisation(newLevel, levelNumber);
+	private void computeDendrogramStatistics(DendrogramLevel newLevel) {
+		double hierarchicalFMeasure = Double.NaN;
+		
+		if(Parameters.isClassAttribute())//Exteran measures
+		{
+			hierarchicalFMeasure = calculateHierarchicalFMeasure();
+		}
+		newLevel.getClusterisationStatistics().setIncrementalHierarchicalFMeasure(hierarchicalFMeasure);
+	}
+
+	private void saveClusterisationResults(DendrogramLevel newLevel, int levelNumber, DataStatistics dataStats) {
+		saveClusterisation(newLevel, levelNumber, dataStats);
 		saveSummaryStatistics(newLevel, levelNumber);
-		if(!Parameters.isNormaliseData())
+		if(Parameters.getGenerateImagesSize() > 0)
 		{
 			saveImage(newLevel, levelNumber);
 		}
 	}
 
-	private void saveClusterisation(DendrogramLevel newLevel, int levelNumber) {
+	private void saveClusterisation(DendrogramLevel newLevel, int levelNumber, DataStatistics dataStats) {
 		if(levelsResultsStorage != null)
 		{
 			File clusterisationFile = new File(levelsResultsStorage.toString() + File.separator + levelNumber + "_clusterisation" + ".csv");
-			newLevel.write(points, clusterisationFile);
+			newLevel.write(points, clusterisationFile, dataStats);
 		}		
 	}
 
@@ -200,16 +267,25 @@ public class Dendrogram {
 	private void saveCompactSummaryStatistics(DendrogramLevel newLevel, int levelNumber, double eclapsedTimeInMin) {
 		try (FileWriter result = new FileWriter(compactSummaryStaticticsFile.toString(), true)) 
 		{
+			ClusterisationStatistics finalStats = getDendrogramBottom().getClusterisationStatistics();
 			result.write(Parameters.getInputDataFilePath() + Constans.delimiter + levelNumber + Constans.delimiter + newLevel.getStatistic()
-					+ Constans.delimiter + getDendrogramBottom().getClusterisationStatistics().getIncrementalHierarchicalFMeasure() + Constans.delimiter 
-					+ Parameters.getK() + Constans.delimiter + Parameters.getNumberOfClusterisationAlgIterations()
+					+ Constans.delimiter + finalStats.getIncrementalHierarchicalFMeasure() 
+					+ Constans.delimiter + finalStats.getPartialOrderFscore()
+					+ Constans.delimiter + finalStats.getStandardFmeasure()
+					+ Constans.delimiter + finalStats.getAdaptedFmeasureWithInheritance()
+					+ Constans.delimiter + finalStats.getAdaptedFmeasureWithOUTInheritance()
+					+ Constans.delimiter + Parameters.getK() + Constans.delimiter + Parameters.getNumberOfClusterisationAlgIterations()
 					+ Constans.delimiter + Parameters.getNumberOfClusterisationAlgRepeats()	+ Constans.delimiter + Parameters.getDendrogramMaxHeight() 
 					+ Constans.delimiter + Parameters.getMaxNumberOfNodes()
 					+ Constans.delimiter + Parameters.getEpsilon() + Constans.delimiter + Parameters.getLittleValue() + Constans.delimiter 
-					+ Parameters.getResponsibilityScallingFactor() + Constans.delimiter + Parameters.getMethod() 
-					+ Constans.delimiter + Parameters.getOutputFolder() + Constans.delimiter + Parameters.getDimensionsNamesFilePath() + Constans.delimiter
-					+ (Parameters.isVerbose()? "true" : "false") + Constans.delimiter + (Parameters.isDisableStaticCenter()? "false" : "true") + Constans.delimiter 
-					+ Double.toString(eclapsedTimeInMin) + "\n");
+					+ Parameters.getResponsibilityScallingFactor() + Constans.delimiter + Parameters.getCovarianceScallingFactor()
+					+ Constans.delimiter + Parameters.getMethod() + Constans.delimiter + Parameters.getOutputFolder() + Constans.delimiter 
+					+ Parameters.getDimensionsNamesFilePath() + Constans.delimiter + (Parameters.isVerbose()? "true" : "false") 
+					+ Constans.delimiter + (Parameters.isDisableStaticCenter()? "false" : "true") + Constans.delimiter 
+					+ Parameters.isStaticCenterAdaptiveCovarianve() + Constans.delimiter + Parameters.isStaticCenterCovarianceScalling()
+					+ Constans.delimiter + Parameters.isStaticCenterResponsibilityScalling() + Constans.delimiter 
+					+ Parameters.isDiagonalCovarianceMatrix() + Constans.delimiter + Parameters.isClusterReestimationBasedOnItsData() 
+					+ Constans.delimiter + Double.toString(eclapsedTimeInMin) + "\n");
 			
 		} 
 		catch (IOException e) {
@@ -217,28 +293,32 @@ public class Dendrogram {
 		}		
 	}
 
-	private Double calculateFMeasure() {
-		double fMeasure = Double.NaN;
-		if(Parameters.isClassAttribute())
+	private Double calculateHierarchicalFMeasure() {
+		double fMeasure = 0.0;
+		int numberOfClasses = points.getDataStats().getClassNameAndItsId().size();
+		int[] eachClassNumOfInstancesWithInheritance = points.getDataStats().getEachClassNumberOfInstanceWithInheritance();
+		int totalNumberOfPointsWithInheritance = 0;
+		double[] eachClassMaxFMeasure = new double[numberOfClasses];
+
+		for(int num: eachClassNumOfInstancesWithInheritance)
 		{
-			fMeasure = 0.0;
-			int numberOfClasses = points.getDataStats().getClassNameAndItsId().size();
-			int[] eachClassNumOfInstances = points.getDataStats().getEachClassNumberOfInstance();
-			double[] eachClassMaxFMeasure = new double[numberOfClasses]; //TODO: czy tam sa 0?
-			for(int classNum = 0; classNum < numberOfClasses; classNum++)
-			{
-				for(int dendLevel = 0; dendLevel < dendrogram.size(); dendLevel++)
-				{
-					double levelMaxClassFMeasure = dendrogram.get(dendLevel).getClusterisationStatistics().getEachClassMaxFMeasure()[classNum];
-					if(levelMaxClassFMeasure > eachClassMaxFMeasure[classNum])
-					{
-						eachClassMaxFMeasure[classNum] = levelMaxClassFMeasure;
-					}
-				}
-				fMeasure += (eachClassNumOfInstances[classNum]/(double)(points.getDataStats().getDatasetLength()-points.getDataStats().getNumberOfNoisePoints())) 
-						* eachClassMaxFMeasure[classNum];
-			}
+			totalNumberOfPointsWithInheritance += num;
 		}
+		
+		for(int classNum = 0; classNum < numberOfClasses; classNum++)
+		{
+			for(int dendLevel = 0; dendLevel < dendrogram.size(); dendLevel++)
+			{
+				double levelMaxClassFMeasure = dendrogram.get(dendLevel).getClusterisationStatistics().getEachClassMaxFMeasure()[classNum];
+				if(levelMaxClassFMeasure > eachClassMaxFMeasure[classNum])
+				{
+					eachClassMaxFMeasure[classNum] = levelMaxClassFMeasure;
+				}
+			}
+			
+			fMeasure += eachClassNumOfInstancesWithInheritance[classNum]*eachClassMaxFMeasure[classNum];
+		}
+		fMeasure /= totalNumberOfPointsWithInheritance;
 		return fMeasure;
 	}
 
@@ -248,7 +328,7 @@ public class Dendrogram {
 		{
 			try {
 				File imgFile = new File(levelsResultsStorage.toString() + File.separator + levelNumber + ".png");
-				ImageIO.write(newLevel.getImage(points), "png", imgFile);
+				ImageIO.write(newLevel.getImage(), "png", imgFile);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -295,6 +375,141 @@ public class Dendrogram {
 		}
 		return false;
 	}
+	
+	public Hierarchy getHierarchyRepresentation()
+	{
+		BasicNode root = null;//will be created as last node
+		ArrayList<BasicNode> tmpGroups = new ArrayList<BasicNode>();
+		HashMap<String, Integer> eachClassWithCount = new HashMap<String, Integer>();
+		int numberOfInstances = 0;
+		LinkedList<DataPoint> alreadyAssignedPoints = new LinkedList<DataPoint>();//points that have been already used on lower level
+		//and need to be excluded from the upper levels
+		
+		HashMap<BasicNode, Integer> nodeWhichIsLookingForParentId = new HashMap<BasicNode, Integer>();
+		
+		for(int i = dendrogram.size()-1; i >= 0; i--)//from bottom to the top in order to EXCLUDE points from upper levels
+		{
+			DendrogramLevel currLevel = dendrogram.get(i);
+			
+			for(Cluster c: currLevel.getClusters())
+			{
+				if(!c.isStaticCenter() && !clusterAlreadyTransformed(tmpGroups, c))//static centers will be modeled on upper levels
+				{//but there is an option that on several dendeogram levels an cluster WONT be static, so we need to check manually if this cluster wasn't considered already
+					String nodeId = String.valueOf(c.getClusterId());
+										
+					LinkedList<Instance> instances = new LinkedList<Instance>();
+					for(DataPoint p: c.getPoints())
+					{
+						if(!alreadyAssignedPoints.contains(p))
+						{
+							alreadyAssignedPoints.add(p);
+							instances.add(new BasicInstance(nodeId, p.getSourceCoordinates(), p.getClassAttribute()));
+							if(Parameters.isClassAttribute())
+							{
+								String classAttrib = p.getClassAttribute();
+								if(eachClassWithCount.containsKey(classAttrib))
+								{
+									eachClassWithCount.put(classAttrib, eachClassWithCount.get(classAttrib) + 1);
+								}
+								else
+								{
+									eachClassWithCount.put(classAttrib, 1);
+								}
+							}
+							numberOfInstances++;
+						}
+					}
+					BasicNode newNode = new BasicNode(nodeId, null, new LinkedList<Node>(), instances); 
+					
+					LinkedList<BasicNode> keyesToRemoveFromMap = new LinkedList<BasicNode>();
+					for(Entry<BasicNode, Integer> potentialChild: nodeWhichIsLookingForParentId.entrySet())
+					{
+						if(potentialChild.getValue().equals(c.getClusterId()))
+						{
+							BasicNode child = potentialChild.getKey();
+							newNode.addChild(child);
+							child.setParent(newNode);
+							keyesToRemoveFromMap.add(child);
+						}
+					}
+					
+					for(BasicNode key: keyesToRemoveFromMap)
+					{
+						nodeWhichIsLookingForParentId.remove(key);
+					}
+					
+					tmpGroups.add(newNode);
+					nodeWhichIsLookingForParentId.put(newNode, c.getParentId());
+				}
+			}
+			
+			if(i == 0)
+			{
+				root = tmpGroups.get(tmpGroups.size()-1);
+			}
+		}
+		
+		standariseInstancesAndGroupNames(root, eachClassWithCount);
+		
+		LinkedList<Node> groups = new LinkedList<Node>();
+		groups.addAll(tmpGroups);
+		return new BasicHierarchy(root, groups, eachClassWithCount, numberOfInstances);
+	}
+
+	private boolean clusterAlreadyTransformed(ArrayList<BasicNode> transformedGroups, Cluster c) {
+		String clusterId = String.valueOf(c.getClusterId());
+		for(BasicNode n: transformedGroups)
+		{
+			if(n.getId().equals(clusterId))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void standariseInstancesAndGroupNames(BasicNode root, HashMap<String, Integer> eachClassWithCount) {
+		Stack<Map.Entry<BasicNode, LinkedList<Integer>>> s = new Stack<>();//basic node and its new name coordinates
+		LinkedList<Integer> nameSkeletone = new LinkedList<>();
+		nameSkeletone.add(0);
+		s.push(new AbstractMap.SimpleEntry<>(root, nameSkeletone));
+		while(!s.isEmpty())
+		{
+			Map.Entry<BasicNode, LinkedList<Integer>> elem = s.pop();
+			changeName(elem, eachClassWithCount);
+			
+			LinkedList<Node> children = elem.getKey().getChildren(); 
+			for(int i = 0; i < children.size(); i++)
+			{
+				LinkedList<Integer> childNameSkeletone = (LinkedList<Integer>) elem.getValue().clone();
+				childNameSkeletone.add(i);
+				s.push(new AbstractMap.SimpleEntry<BasicNode, LinkedList<Integer>>((BasicNode)children.get(i), childNameSkeletone));
+			}
+		}
+		
+	}
+	
+	private void changeName(Entry<BasicNode, LinkedList<Integer>> element, HashMap<String,Integer> eachClassWithCount) {
+		LinkedList<Integer> nameCoordinates = element.getValue();
+		String newName = Constans.groupHierarchyPrefix;
+		for(int i = 0; i < nameCoordinates.size(); i++)
+		{
+			newName += Constans.groupsHierarchySeparator + nameCoordinates.get(i);
+		}
+		
+		BasicNode node = element.getKey();
+		if(eachClassWithCount.containsKey(node.getId()))
+		{
+			int count = eachClassWithCount.remove(node.getId());
+			eachClassWithCount.put(newName, count);
+		}
+		node.setId(newName);
+		for(Instance i: node.getNodeInstances())
+		{
+			i.setNodeId(newName);
+		}
+		
+	}
 
 	private DendrogramLevel getDendrogramBottom()
 	{
@@ -307,5 +522,13 @@ public class Dendrogram {
 	public double getFinalStatistic()
 	{
 		return getDendrogramBottom().getStatistic();
+	}
+
+	public Data getPoints() {
+		return points;
+	}
+
+	public ArrayList<DendrogramLevel> getDendrogram() {
+		return dendrogram;
 	}
 }

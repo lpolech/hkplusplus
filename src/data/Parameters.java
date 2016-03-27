@@ -17,10 +17,16 @@ public class Parameters {
 	private static double epsilon;
 	private static double littleValue;
 	private static boolean classAttribute;
-	private static boolean normaliseData;
+	private static int generatedImgsSize;
 	private static boolean disableStaticCenter;
 	private static int maxNumberOfNodes;
 	private static double responsibilityScallingFactor;
+	private static boolean staticCenterResponsibilityScalling = false;
+	private static double covarianceScallingFactor;
+	private static boolean staticCenterAdaptiveCovarianve = false;
+	private static boolean staticCenterCovarianceScalling = false;
+	private static boolean diagonalCovarianceMatrix = false;
+	private static boolean clusterReestimationBasedOnItsData = false;
 	
 	private Parameters()
 	{
@@ -124,12 +130,12 @@ public class Parameters {
 		Parameters.classAttribute = isClassAttribute;
 	}
 
-	public static boolean isNormaliseData() {
-		return normaliseData;
+	public static int getGenerateImagesSize() {
+		return Parameters.generatedImgsSize;
 	}
 
-	public static void setNormaliseData(boolean normaliseData) {
-		Parameters.normaliseData = normaliseData;
+	public static void setGenerateImagesSize(int generatedImgsSize) {
+		Parameters.generatedImgsSize = generatedImgsSize;
 	}
 
 	public static boolean isDisableStaticCenter() {
@@ -155,4 +161,53 @@ public class Parameters {
 	public static void setResponsibilityScallingFactor(double responsibilityScallingFactor) {
 		Parameters.responsibilityScallingFactor = responsibilityScallingFactor;
 	}
+
+	public static boolean isStaticCenterResponsibilityScalling() {
+		return staticCenterResponsibilityScalling;
+	}
+
+	public static void setStaticCenterResponsibilityScalling(boolean staticCenterResponsibilityScalling) {
+		Parameters.staticCenterResponsibilityScalling = staticCenterResponsibilityScalling;
+	}
+
+	public static boolean isStaticCenterCovarianceScalling() {
+		return staticCenterCovarianceScalling;
+	}
+
+	public static void setStaticCenterCovarianceScalling(boolean staticCenterScalledCovariance) {
+		Parameters.staticCenterCovarianceScalling = staticCenterScalledCovariance;
+	}
+
+	public static boolean isStaticCenterAdaptiveCovarianve() {
+		return staticCenterAdaptiveCovarianve;
+	}
+
+	public static void setStaticCenterAdaptiveCovarianve(boolean staticCenterAdaptiveCovarianve) {
+		Parameters.staticCenterAdaptiveCovarianve = staticCenterAdaptiveCovarianve;
+	}
+
+	public static double getCovarianceScallingFactor() {
+		return covarianceScallingFactor;
+	}
+
+	public static void setCovarianceScallingFactor(double covarianceScallingFactor) {
+		Parameters.covarianceScallingFactor = covarianceScallingFactor;
+	}
+
+	public static boolean isDiagonalCovarianceMatrix() {
+		return diagonalCovarianceMatrix;
+	}
+
+	public static void setDiagonalCovarianceMatrix(boolean diagonalCovarianceMatrix) {
+		Parameters.diagonalCovarianceMatrix = diagonalCovarianceMatrix;
+	}
+
+	public static boolean isClusterReestimationBasedOnItsData() {
+		return Parameters.clusterReestimationBasedOnItsData;
+	}
+	
+	public static void setClusterReestimationBasedOnItsData(boolean clusterReestimationBasedOnItsData) {
+		Parameters.clusterReestimationBasedOnItsData = clusterReestimationBasedOnItsData;
+	}
+
 }

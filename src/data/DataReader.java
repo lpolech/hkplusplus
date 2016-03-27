@@ -142,7 +142,7 @@ public class DataReader {
 				System.exit(1);
 			}
 		}
-		data[readPointsCounter] = new DataPoint(coordinates, classAttribute);
+		data[readPointsCounter] = new DataPoint(coordinates, coordinates, classAttribute);
 	}
 
 	private static HashMap<Integer, String> readAndParseDimensionsNames(
@@ -193,6 +193,7 @@ public class DataReader {
 			DataPoint[] points, int numberOfDimensions, HashMap<String, Integer> classNameAndItsId) {
 		double[] minValues = new double[numberOfDimensions];
 		double[] maxValues = new double[numberOfDimensions];
+		double[] eachDimNormalisationInterval = new double[numberOfDimensions];
 		
 		for(int i = 0; i < numberOfDimensions; i++)
 		{
@@ -215,11 +216,11 @@ public class DataReader {
 			}
 		}
 		
-		int[] eachClassNumberOfInstance = null;
+		int[] eachClassNumberOfInstanceWithInheritance = null;
 		int numberOfNoisePoints = 0;
 		if(Parameters.isClassAttribute())
 		{
-			eachClassNumberOfInstance = new int[classNameAndItsId.size()];
+			eachClassNumberOfInstanceWithInheritance = new int[classNameAndItsId.size()];
 			for(DataPoint p: points)
 			{
 				if(p.getClassAttribute().contains("Noise"))
@@ -228,11 +229,31 @@ public class DataReader {
 				}
 				else
 				{
-					eachClassNumberOfInstance[classNameAndItsId.get(p.getClassAttribute())]++;
+					String classAttrib = p.getClassAttribute();
+					eachClassNumberOfInstanceWithInheritance[classNameAndItsId.get(classAttrib)]++;
+					for(String potentialParentClass: classNameAndItsId.keySet())
+					{
+						if(potentialParentClass.length() < classAttrib.length() 
+							&& classAttrib.startsWith(potentialParentClass + basic_hierarchy.common.Constants.HIERARCHY_BRANCH_SEPARATOR))
+						{
+							eachClassNumberOfInstanceWithInheritance[classNameAndItsId.get(potentialParentClass)]++;
+						}
+					}
 				}
 			}
 		}
 		
-		return new DataStatistics(minValues, maxValues, points.length, classNameAndItsId, eachClassNumberOfInstance, numberOfNoisePoints);
+		for(int i = 0; i < numberOfDimensions; i++)
+		{
+			eachDimNormalisationInterval[i] = maxValues[i] - minValues[i];
+			if(minValues[i] == maxValues[i])
+			{
+				System.err.println("DataReader.calculateDataStatistics(..) Warning, found min and max values are equal!"
+						+ " This means, that on dimension number " + i + " there is no diferent values.");
+			}
+		}
+		
+		return new DataStatistics(minValues, maxValues, eachDimNormalisationInterval, points.length, classNameAndItsId, 
+				eachClassNumberOfInstanceWithInheritance, numberOfNoisePoints);
 	}
 }

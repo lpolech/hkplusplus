@@ -80,7 +80,8 @@ public class CmdLineParser {
 				.withLongOpt("dendrogram-size")
 				.create('s');	
 		
-		Option dimensionsNamesFile = OptionBuilder.withArgName("path to file with dimensions names <dimensionNumber>" + Constans.delimiter + "<name>")
+		Option dimensionsNamesFile = OptionBuilder.withArgName("path to file with dimensions names <dimensionNumber>" + Constans.delimiter 
+				+ "<name>")
 				.hasArgs(1)
 				.withArgName("dimensionsNamesFilePath")
 				.isRequired(false)
@@ -89,15 +90,17 @@ public class CmdLineParser {
 				.withLongOpt("dimNames")
 				.create('d');
 		
-		Option epsilon = OptionBuilder.withDescription("Epsilon value expressed as 10^-epsilon, used in comparing values to 0.0, reducing round-off error. Default value is 10.")
-				.hasArgs(1)
+		Option epsilon = OptionBuilder.withDescription("Epsilon value expressed as 10^-epsilon, used in comparing values to 0.0, reducing "
+				+ "round-off error. Default value is 10.")
+				.hasOptionalArgs(1)
 				.isRequired(false)
 				.withArgName("epsilonValue")
 				.withLongOpt("eps")
 				.create('e');
 		
-		Option littleValue = OptionBuilder.withDescription("Value of diagonal matrix elements expressed as 10^-littleValue, used in forcing covariance matrix to be non-singular. Default value is 5.")
-				.hasArgs(1)
+		Option littleValue = OptionBuilder.withDescription("Value of diagonal matrix elements expressed as 10^-littleValue, used in forcing "
+				+ "covariance matrix to be non-singular. Default value is 5.")
+				.hasOptionalArgs(1)
 				.isRequired(false)
 				.withArgName("littleValue")
 				.withLongOpt("littleVal")
@@ -110,12 +113,29 @@ public class CmdLineParser {
 				.withLongOpt("maxNumOfNodes")
 				.create('w');
 		
-		Option responsibilityScallingFactor = OptionBuilder.withDescription("Scalling factor of static center responsibility computation values. In order to decrease it provide value in range (0;1).")
+		Option responsibilityScallingFactor = OptionBuilder.withDescription("Scalling factor of static center responsibility computation "
+				+ "values. In order to decrease it provide value in range (0;1).")
 				.hasArgs(1)
 				.isRequired(false)
 				.withArgName("responsibilityScallingFactor")
 				.withLongOpt("respSclFactor")
-				.create('f');
+				.create("rf");
+		
+		Option covarianceScallingFactor = OptionBuilder.withDescription("Scalling factor of static center covariance set when derived to "
+				+ "lower levels. In order to increase it provide value in range (0;1).")
+				.hasArgs(1)
+				.isRequired(false)
+				.withArgName("covarianceScallingFactor")
+				.withLongOpt("covSclFactor")
+				.create("cf");
+		
+		Option resultImagesSize = OptionBuilder.withDescription("store clusterisation results also as images (ONLY first two dimensions are"
+				+ " visualused!) the dimension of each image is SxS where S is the provided arguments value. Default is 800.")
+				.hasOptionalArgs(1)
+				.isRequired(false)
+				.withArgName("generateImages")
+				.withLongOpt("genImgs")
+				.create("gi");
 		
 		Option help = OptionBuilder.withDescription("prints this message")
 				.hasArg(false)
@@ -126,11 +146,22 @@ public class CmdLineParser {
 		options.addOption("km", "use-kmeans", false, "use kmeans clustering algorithm");
 		options.addOption("gmm", "use-gaussian-mixture-model", false, "use gaussian-mixture-model clustering with expectation-maximisation");
 		options.addOption("v", "verbose", false, "verbose program execution");
-		options.addOption("c", "class-attribute", false, "indicates that FIRST column of data is class attribute, class shoud be indicated by string. When class attribute is provided "
-				+ "then recall, precision and F-Measure will be calculated for each dendrogram level and for whole dednrogram. See \"Fast and effective text mining using linear-time "
+		options.addOption("c", "class-attribute", false, "indicates that FIRST column of data is class attribute, class shoud be indicated "
+				+ "by string. When class attribute is provided "
+				+ "then recall, precision and F-Measure will be calculated for each dendrogram level and for whole dednrogram. See \"Fast "
+				+ "and effective text mining using linear-time "
 				+ "document clustering\" by B. Larsen and C. Aone (1999)");
-		options.addOption("nn", "not-normalise-data", false, "do not normalise data, and becaufe of that program can return visualisation of clustering process");
-		options.addOption("ds", "disable-static-center", false, "disable feature of placing static (backgroud) center while going down in hierarchy");
+		options.addOption("ds", "disable-static-center", false, "disable feature of placing static (backgroud) center while going down in "
+				+ "hierarchy");
+		options.addOption("scrs", "static-center-resposibility-scalling", false, "scale responibility value from static centers to points, "
+				+ "using value of resposibilityScallingFactor (f)");
+		options.addOption("scac", "static-center-adaptive-covariance", false, "when deriving static center to lower level, its covariance "
+				+ "is scalled by factor 1/(prioriValue)");
+		options.addOption("sccs", "static-center-covariance-scalling", false, "when deriving static center to lower level, its covariance "
+				+ "is scalled by factor 1/(covarianceScallingFactor)");
+		options.addOption("dm", "diagonal-matrix", false, "use simple diagonal matrix instead of full matrix as a covariance matrix");
+		options.addOption("re", "reestimate", false, "reestimate cluster centre and covariance matrix after EM finishes by using cluster "
+				+ "actual data");
 		
 		options.addOption(input);
 		options.addOption(output);
@@ -143,6 +174,8 @@ public class CmdLineParser {
 		options.addOption(littleValue);
 		options.addOption(numberOfNodes);
 		options.addOption(responsibilityScallingFactor);
+		options.addOption(covarianceScallingFactor);
+		options.addOption(resultImagesSize);
 		options.addOption(help);
 	}
 	
@@ -171,23 +204,20 @@ public class CmdLineParser {
 		Parameters.setOutputFolder(parseOutputFile());
 		Parameters.setDimensionsNamesFilePath(parseDimensionsNamesFile());
 		
-		int numberOfClusterisationAlgIterations = parsePositiveIntegerParameter(cmd.getOptionValue('n'),
-													"Number of clusterisation algorithm iterations"
-													+ " should be an integer positive value!");
+		int numberOfClusterisationAlgIterations = parsePositiveIntegerParameter(cmd.getOptionValue('n'), "Number of clusterisation algorithm"
+				+ " iterations should be an integer positive value!");
 		Parameters.setNumberOfClusterisationAlgIterations(numberOfClusterisationAlgIterations);
 		
-		int numberOfRepeats = parsePositiveIntegerParameter(cmd.getOptionValue('r'),
-													"Number of clusterisation algorithm repeats"
-													+ " should be an integer positive value!");
+		int numberOfRepeats = parsePositiveIntegerParameter(cmd.getOptionValue('r'), "Number of clusterisation algorithm repeats should be "
+				+ "an integer positive value!");
 		
 		Parameters.setNumberOfClusterisationAlgRepeats(numberOfRepeats);
 		
-		int k = parsePositiveIntegerParameter(cmd.getOptionValue("k"), "Number of clusters should"
-															+ " be an integer positive value!");
+		int k = parsePositiveIntegerParameter(cmd.getOptionValue("k"), "Number of clusters should be an integer positive value!");
 		Parameters.setK(k);
 		
-		int dendrogramMaxHeight = parsePositiveIntegerParameter(cmd.getOptionValue('s'), "Maximum "
-									+ "dedrogram height should be an positive integer value!");
+		int dendrogramMaxHeight = parsePositiveIntegerParameter(cmd.getOptionValue('s'), "Maximum dedrogram height should be an positive "
+				+ "integer value!");
 		Parameters.setDendrogramMaxHeight(dendrogramMaxHeight);
 		
 		Parameters.setVerbose(cmd.hasOption('v'));
@@ -196,9 +226,9 @@ public class CmdLineParser {
 		
 		Parameters.setClassAttribute(cmd.hasOption('c'));
 		
-		Parameters.setNormaliseData(!cmd.hasOption("nn"));
-		
 		Parameters.setDisableStaticCenter(cmd.hasOption("ds"));
+
+		Parameters.setGenerateImagesSize(parseGenerateImagesSize());
 		
 		Parameters.setEpsilon(parseEpsilon());
 		
@@ -206,7 +236,26 @@ public class CmdLineParser {
 		
 		Parameters.setMaxNumberOfNodes(parseMaxNumberOfNodes());
 		
+		Parameters.setStaticCenterAdaptiveCovarianve(cmd.hasOption("scac"));
+
+		Parameters.setCovarianceScallingFactor(parseCovarianceScallingFactor());
+		
+		Parameters.setStaticCenterCovarianceScalling(cmd.hasOption("sccs"));
+		
 		Parameters.setResponsibilityScallingFactor(parseResponsibilityScallingFactor());
+		
+		Parameters.setStaticCenterResponsibilityScalling(cmd.hasOption("scrs"));
+				
+		if(Parameters.isStaticCenterAdaptiveCovarianve() && Parameters.isStaticCenterCovarianceScalling())
+		{
+			System.err.println("Both static center covariance ADAPTIVE (-scac) and FACTOR (-sccs) scalling is set! You need to specify"
+					+ " only one of these.");
+			System.exit(1);
+		}
+				
+		Parameters.setDiagonalCovarianceMatrix(cmd.hasOption("dm"));
+		
+		Parameters.setClusterReestimationBasedOnItsData(cmd.hasOption("re"));
 	}
 
 	private AlgEnum parseMethod() {
@@ -223,33 +272,43 @@ public class CmdLineParser {
 		return null;
 	}
 
-
+	private int parseGenerateImagesSize() {
+		int size = Integer.MIN_VALUE;
+		if(cmd.hasOption("gi"))
+		{
+			size = parseIntegerParameter(cmd.getOptionValue("gi", "800"), "Generated images size should be and positive integer value");
+		}
+		return size;
+	}
+	
 	private double parseEpsilon() {
-		int epsilon;
+		int epsilon = Integer.MIN_VALUE;
 		if(cmd.hasOption('e'))
 		{
-			epsilon = parseIntegerParameter(cmd.getOptionValue('e'), "Epsilon "
+			epsilon = parseIntegerParameter(cmd.getOptionValue('e', "10"), "Epsilon "
 					+ "value should be an integer value used as 10^-epsilon");
-		}
-		else
-		{
-			epsilon = 10; 
 		}
 		return Math.pow(10, (-1.0d)*(double)epsilon);//uzywane do porownywania doubli z 0.0 //10^-5 
 	}
 	
-	private double parseResponsibilityScallingFactor() {
-		double covarianceScallingFactor = 0;
-		if(cmd.hasOption("f"))
+	private double parseCovarianceScallingFactor() {
+		double covarianceScallingFactor = Double.MIN_VALUE;
+		if(cmd.hasOption("cf"))
 		{
-			covarianceScallingFactor = parseDoubleParameter(cmd.getOptionValue("f"), "Static center responsibility "
+			covarianceScallingFactor = parseDoubleParameter(cmd.getOptionValue("cf", "1.0"), "Static center covariance "
 					+ "scalling factor value should be an real value! There will be no scalling (f:=1.0.");
 		}
-		else
-		{
-			covarianceScallingFactor = 1.0;
-		}
 		return covarianceScallingFactor;
+	}
+	
+	private double parseResponsibilityScallingFactor() {
+		double responsibilityScallingFactor = Double.MIN_VALUE;
+		if(cmd.hasOption("rf"))
+		{
+			responsibilityScallingFactor = parseDoubleParameter(cmd.getOptionValue("rf", "1.0"), "Static center responsibility "
+					+ "scalling factor value should be an real value! There will be no scalling (f:=1.0.");
+		}
+		return responsibilityScallingFactor;
 	}
 	
 	private int parseMaxNumberOfNodes() {
@@ -263,15 +322,11 @@ public class CmdLineParser {
 	}
 
 	private double parseLittleValue() {
-		int littleValue;
+		int littleValue = Integer.MIN_VALUE;
 		if(cmd.hasOption('l'))
 		{
-			littleValue = parseIntegerParameter(cmd.getOptionValue('l'), "Little value "
+			littleValue = parseIntegerParameter(cmd.getOptionValue('l', "5"), "Little value "
 					+ "value should be an integer value used as 10^-littleValue");
-		}
-		else
-		{
-			littleValue = 5; 
 		}
 		return Math.pow(10, (-1.0d)*(double)littleValue);//uzywana do diagonala macierzy, aby macierz stala sie odwracalna// -1
 	}

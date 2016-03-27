@@ -15,18 +15,9 @@ public class Data {
 		System.out.println(numberOfDimensions);
 		DataPoint.setNumberOfDimensions(numberOfDimensions);
 		
-		if(Parameters.isNormaliseData())
-		{
-			System.out.println("Normalising data...");
-			this.points = DataNormalisation.normalise(points);
-			System.out.println("No clusterisation imgs will be produced.");
-			System.out.println("Normalisation - done.");
-		}
-		else
-		{
-			System.out.println("Data wont be normalised. Imgs of clusterisation will be produced.");
-			this.points = points;
-		}
+		System.out.println("Normalising data...");
+		this.points = DataNormalisation.normalise(points, dataStats);
+		System.out.println("Normalisation - done.");
 		
 		this.numberOfPoints = numberOfPoints;
 		this.numberOfDimensions = numberOfDimensions;

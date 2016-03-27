@@ -5,16 +5,19 @@ import java.util.HashMap;
 public class DataStatistics {
 	private double[] minValues;
 	private double[] maxValues;
-	private int[] eachClassNumberOfInstance;
+	private double[] eachDimNormalisationInterval;
+	private int[] eachClassNumberOfInstanceWithInheritance;
 	private HashMap<String,Integer> classNameAndItsId;
 	private int datasetLength;
 	private int numberOfNoisePoints;
 	
-	public DataStatistics(double[] minValues, double[] maxValues, int datasetLength, HashMap<String,Integer> classNameAndItsId, int[] eachClassNumberOfInstance, int numberOfNoisePoints)
+	public DataStatistics(double[] minValues, double[] maxValues, double[] eachDimNormalisationInterval, int datasetLength, 
+			HashMap<String,Integer> classNameAndItsId, int[] eachClassNumberOfInstanceWithInheritance, int numberOfNoisePoints)
 	{
 		this.minValues = minValues;
 		this.maxValues = maxValues;
-		this.eachClassNumberOfInstance = eachClassNumberOfInstance;
+		this.eachDimNormalisationInterval = eachDimNormalisationInterval;
+		this.eachClassNumberOfInstanceWithInheritance = eachClassNumberOfInstanceWithInheritance;
 		this.classNameAndItsId = classNameAndItsId;
 		this.datasetLength = datasetLength;
 		this.numberOfNoisePoints = numberOfNoisePoints;
@@ -33,12 +36,12 @@ public class DataStatistics {
 		this.maxValues = maxValues;
 	}
 
-	public int[] getEachClassNumberOfInstance() {
-		return eachClassNumberOfInstance;
+	public int[] getEachClassNumberOfInstanceWithInheritance() {
+		return eachClassNumberOfInstanceWithInheritance;
 	}
 
-	public void setEachClassNumberOfInstance(int[] eachClassNumberOfInstance) {
-		this.eachClassNumberOfInstance = eachClassNumberOfInstance;
+	public void setEachClassNumberOfInstanceWithInheritance(int[] eachClassNumberOfInstance) {
+		this.eachClassNumberOfInstanceWithInheritance = eachClassNumberOfInstance;
 	}
 
 	public HashMap<String, Integer> getClassNameAndItsId() {
@@ -63,5 +66,13 @@ public class DataStatistics {
 
 	public void setNumberOfNoisePoints(int numberOfNoisePoints) {
 		this.numberOfNoisePoints = numberOfNoisePoints;
+	}
+
+	public double[] getEachDimNormalisationInterval() {
+		return eachDimNormalisationInterval;
+	}
+
+	public void setEachDimNormalisationInterval(double[] eachDimNormalisationInterval) {
+		this.eachDimNormalisationInterval = eachDimNormalisationInterval;
 	}
 }

@@ -31,7 +31,7 @@ public class Cluster {
 	public Cluster(DataPoint[] points, DataPoint center, Matrix covariance, double mixingCoefficient, Color clusterColorOnImage, int parentId, int clusterId)
 	{
 		this(points, center, clusterColorOnImage, parentId, clusterId);
-		this.covariance = covariance.copy();
+		this.covariance = covariance;
 		this.mixingCoefficient = mixingCoefficient;
 	}
 	

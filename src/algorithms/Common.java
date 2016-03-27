@@ -26,7 +26,7 @@ public class Common implements Algorithm {
 			do
 			{
 				pointsIndices[i] = randomGenerator.nextInt(parent.getNumberOfPoints());
-				seeds[i] = new DataPoint(parent.getPoints()[pointsIndices[i]].getCoordinates(), "centroid (from seed points)");//copy constructor, bo to sa centra, ktore beda modyfikowane
+				seeds[i] = new DataPoint(parent.getPoints()[pointsIndices[i]].getCoordinates(), null, "centroid (from seed points)");//copy constructor, bo to sa centra, ktore beda modyfikowane
 			}
 			while(!indicesAreDistinct(pointsIndices, i) || !seedPointsHaveDifferentCoordinates(seeds, i));
 		}

@@ -24,7 +24,7 @@ public class DendrogramLevel {
 	private static CenterMethod distanceMethod;
 	private static Measure measure;
 	private Cluster[] clusters;
-	private BufferedImage imageRepresentation;//zakladam dane 2 wymiarowe!
+	private BufferedImage imageRepresentation;//only first 2 dimensions are visualised
 	private double statistic = -1;
 	private ClusterisationStatistics clusterisationStatistics;
 
@@ -44,7 +44,7 @@ public class DendrogramLevel {
 		return true;
 	}
 
-	public DendrogramLevel expandTree(int k, int currentLevelNumber, DataStatistics dataStatistics, int numberOfAlreadyCreatedNodes) {//FIXME strong refaktor rozwazyc: rezygnacja z tablic i przejscie na array list
+	public DendrogramLevel expandTree(int k, int currentLevelNumber, DataStatistics dataStatistics, int numberOfAlreadyCreatedNodes) {//FIXME refactoring: get rid of arrays and use dynamic arrays (e.g. array list)
 		int numberOfClustersToExpand = getNumberOfNonStaticClusters();
 		int numberOfClusters = getNumberOfClustersOnGivenLevel(k, currentLevelNumber, numberOfClustersToExpand);
 		Cluster[] newLevelClusters = new Cluster[numberOfClusters];
@@ -56,11 +56,12 @@ public class DendrogramLevel {
 			ClustersAndTheirStatistics newClusters = null;
 			ClustersAndTheirStatistics bestFoundClusterisation = new ClustersAndTheirStatistics(null, measure.getTheWorstMeasureValue(), false);
 
-			if(numberOfAlreadyCreatedNodes < Parameters.getMaxNumberOfNodes() && canSplitCluster(i, k))//pomijam stale centra oraz te, ktore juz nie mozna podzielic
+			if(numberOfAlreadyCreatedNodes < Parameters.getMaxNumberOfNodes() && canSplitCluster(i, k))//skip static centers and centers that can't be further divided
 			{
 				if(Parameters.isVerbose())
 				{
-					System.out.print("\tExpanding cluster " + (clusterCounter++) + "/" + numberOfClustersToExpand + ". ");
+					System.out.print("\tExpanding cluster id: " + clusters[i].getClusterId() + " " + (clusterCounter++) + "/" 
+							+ numberOfClustersToExpand + ". ");
 				}
 				for(int j = 0; j < Parameters.getNumberOfClusterisationAlgRepeats(); j++)
 				{
@@ -72,7 +73,7 @@ public class DendrogramLevel {
 				}
 				numberOfAlreadyCreatedNodes += bestFoundClusterisation.getClusters().length;
 			}
-			else//zostawiam koncowe centra w kazdyn z poziomow, aby kazde z centr bylo widoczne na kazdym poziomie
+			else//retain last centers on every level in order to get them visible
 			{
 				Cluster[] notSplittedCluster = new Cluster[]{clusters[i]};
 				bestFoundClusterisation = new ClustersAndTheirStatistics(notSplittedCluster, measure.calculateClusterisationStatistic(notSplittedCluster), true);
@@ -83,12 +84,14 @@ public class DendrogramLevel {
 				
 				if(notSplittedCluster[0].isStaticCenter() && Parameters.isVerbose())
 				{
-					System.out.println("\tMoving static center (" + notSplittedCluster[0].getCenter() +") from upper level. " + measure.printClusterisationStatisticName()
+					System.out.println("\tMoving static center (id: " + notSplittedCluster[0].getClusterId() + " " + notSplittedCluster[0].getCenter() 
+							+ ") from upper level. " + measure.printClusterisationStatisticName()
 							+ ": " + bestFoundClusterisation.getClusterisationStatistic());
 				}
 				else if(Parameters.isVerbose())
 				{
-					System.out.print("\tExpanding cluster " + (clusterCounter++) + "/" + numberOfClustersToExpand + ". Can't split, just copy. ");
+					System.out.print("\tExpanding cluster id: " + notSplittedCluster[0].getClusterId() + " " + (clusterCounter++) + "/" 
+							+ numberOfClustersToExpand + ". Can't split, just copy. ");
 				}
 			}
 			
@@ -105,10 +108,10 @@ public class DendrogramLevel {
 		}
 		
 		DendrogramLevel newLevel = new DendrogramLevel(nonExpandedClustersCounter, dataStatistics);
-		if(elementCounter != numberOfClusters)//powstalo mniej klastrow niz zakladalismy
+		if(elementCounter != numberOfClusters)//there are less clusters that ii was expected
 		{
 			newLevel.clusters = new Cluster[elementCounter];
-			for(int i = 0; i < elementCounter; i++)// TODO pomijam niezainicjalizowane klastry, moze warto wykminic lepszys posob?
+			for(int i = 0; i < elementCounter; i++)//TODO skip not initialised clusters, maybe there could be a better way of doing it
 			{
 				newLevel.clusters[i] = newLevelClusters[i];
 			}
@@ -118,8 +121,8 @@ public class DendrogramLevel {
 			newLevel.clusters = newLevelClusters;
 		}
 		
-		newLevel.statistic = measure.calculateClusterisationStatistic(newLevel.clusters);// TODO: zmieniæ nazwe na np. objectiveFunction
-		newLevel.clusterisationStatistics.compute(newLevel);
+		newLevel.statistic = measure.calculateClusterisationStatistic(newLevel.clusters);//FIXME: change name to e.g. "objectiveFunction"
+		newLevel.clusterisationStatistics.computeFlatClusterisationFMeasure(newLevel);
 		System.out.println("Level " + measure.printClusterisationStatisticName()
 				+ ": " + newLevel.statistic);
 		
@@ -170,8 +173,7 @@ public class DendrogramLevel {
 			int currentLevelNumber, int numberOfNonStaticClusters) {
 		int numberOfStaticClustersOnThisLevel = clusters.length;
 		int numberOfMaximumNewClusters = k*(numberOfNonStaticClusters-this.numberOfNotExpandedNonStaticCenters) + numberOfNotExpandedNonStaticCenters;//numberOfNonStaticClusters*k;
-		return numberOfMaximumNewClusters + numberOfStaticClustersOnThisLevel;//uwzgledniam mozliwosc rozszerzania NIE-statycznych klkastrow
-		//oraz obecnosc tych statycznych
+		return numberOfMaximumNewClusters + numberOfStaticClustersOnThisLevel;
 	}
 
 	private int getNumberOfNonStaticClusters() {
@@ -190,15 +192,33 @@ public class DendrogramLevel {
 		clusters = new Cluster[1];
 		clusters[0] = distanceMethod.makeCluster(points, measure);
 		this.statistic = measure.calculateClusterisationStatistic(this.clusters);
-		this.clusterisationStatistics.compute(this);
+		this.clusterisationStatistics.computeFlatClusterisationFMeasure(this);
 	}
 
-	public void write(Data points, File clusterisationFile) 
+	public void write(Data points, File clusterisationFile, DataStatistics dataStats) 
 	{
 		try (FileWriter result = new FileWriter(clusterisationFile, false)) 
 		{
-			result.write("Level summary statistics" + Constans.delimiter + statistic + "\n");//napisac statystyki poziomu
-
+			result.write("Level summary statistics" + Constans.delimiter + "distance from pdf" + Constans.delimiter + statistic + "\n");
+			if(Parameters.isClassAttribute())
+			{
+				result.write(Constans.delimiter + "Flat clust FMeasure:" + Constans.delimiter 
+						+ clusterisationStatistics.getFlatClusterisationFMeasure() + "\n");
+				result.write(Constans.delimiter + "Incremental hierarchical FMeasure:" + Constans.delimiter 
+						+ clusterisationStatistics.getIncrementalHierarchicalFMeasure() + "\n");
+				
+				//TODO: this calculations extend program execution 10 times, so this calculations should be enabled by additional flag
+//				result.write(Constans.delimiter + "Adapted FMeasure WITH inheritance:" + Constans.delimiter 
+//						+ clusterisationStatistics.getAdaptedFmeasureWithInheritance() + "\n");
+//				result.write(Constans.delimiter + "Adapted FMeasure WITHOUT inheritance:" + Constans.delimiter 
+//						+ clusterisationStatistics.getAdaptedFmeasureWithOUTInheritance() + "\n");
+//				result.write(Constans.delimiter + "Standard FMeasure:" + Constans.delimiter 
+//						+ clusterisationStatistics.getStandardFmeasure() + "\n");
+//				result.write(Constans.delimiter + "Partial order FMeasure:" + Constans.delimiter 
+//						+ clusterisationStatistics.getPartialOrderFscore() + "\n");
+			}
+			result.write("\n");
+			
 			for(int i = 0; i < clusters.length; i++)
 			{
 				result.write("Cluster" + Constans.delimiter + i + "\n");
@@ -206,6 +226,13 @@ public class DendrogramLevel {
 				result.write("Parent Id" + Constans.delimiter + clusters[i].getParentId() + "\n");
 				result.write("Static" + Constans.delimiter + (clusters[i].isStaticCenter()? "yes" : "no") + "\n");
 				result.write("Center" + Constans.delimiter + clusters[i].getCenter() + "\n");
+				result.write("Center (denormalised)");
+				for(int j = 0; j < points.getNumberOfDimensions(); j++)
+				{
+					result.write(Constans.delimiter + (clusters[i].getCenter().getCoordinate(j) * dataStats.getEachDimNormalisationInterval()[j] 
+							+ dataStats.getMinValues()[j]));
+				}
+				result.write("\n");
 				result.write("Colour [r g b]" + Constans.delimiter + Utils.getStringOfColor(clusters[i].getColorOnImage()) + "\n");
 				result.write("Points (" + clusters[i].getPoints().length + "):\n");
 				for(int j = 0; j < clusters[i].getPoints().length; j++)
@@ -234,18 +261,18 @@ public class DendrogramLevel {
 		}		
 	}
 	
-	public BufferedImage getImage(Data data)
+	public BufferedImage getImage()
 	{
 		if(imageRepresentation == null)
 		{
-			createImageRepresentation(data.getDataStats());
+			createImageRepresentation();
 		}
 		return imageRepresentation;
 	}
 
-	private void createImageRepresentation(DataStatistics dataStats) {
-		int imgWidth = Utils.roundToUpper(dataStats.getMaxValues()[0]) + 1;//TODO na razie zakladam 2 wymiarowe dane i to, ze dane sa dodatnie i zaczynaja sie od 0,0
-		int imgHeight = Utils.roundToUpper(dataStats.getMaxValues()[1]) + 1;
+	private void createImageRepresentation() {
+		int imgWidth = Utils.roundToUpper(Parameters.getGenerateImagesSize()) + 1;//FIXME assume 2-dimensional data and non-negative values of features
+		int imgHeight = Utils.roundToUpper(Parameters.getGenerateImagesSize()) + 1;
 		
 		createEmptyImage(imgWidth, imgHeight);
 		drawClusters();
@@ -273,8 +300,8 @@ public class DendrogramLevel {
 			clusterColor = clr.getColorOnImage();
 			for(DataPoint p: clr.getPoints())
 			{
-				imageRepresentation.setRGB(Utils.roundToUpper(p.getCoordinate(0)), 
-						Utils.roundToUpper(p.getCoordinate(1)), clusterColor.getRGB());				
+				imageRepresentation.setRGB(Utils.roundToUpper(p.getCoordinate(0) * Parameters.getGenerateImagesSize()), 
+						Utils.roundToUpper(p.getCoordinate(1) * Parameters.getGenerateImagesSize()), clusterColor.getRGB());				
 			}
 		}		
 	}
@@ -284,22 +311,32 @@ public class DendrogramLevel {
 		Color centerColor = new Color(0, 0, 0);
 		for(Cluster clr: clusters)
 		{
-			imageRepresentation.setRGB(Utils.roundToUpper(clr.getCenter().getCoordinate(0)), 
-					Utils.roundToUpper(clr.getCenter().getCoordinate(1)), centerColor.getRGB());
-			if(Utils.roundToUpper(clr.getCenter().getCoordinate(0)) > 0 
-					&& Utils.roundToUpper(clr.getCenter().getCoordinate(0)) < (imageRepresentation.getWidth() - 1)
-					&& Utils.roundToUpper(clr.getCenter().getCoordinate(1)) > 0
-					&& Utils.roundToUpper(clr.getCenter().getCoordinate(1)) < (imageRepresentation.getHeight() - 1))
+			imageRepresentation.setRGB(Utils.roundToUpper(clr.getCenter().getCoordinate(0) * Parameters.getGenerateImagesSize()), 
+					Utils.roundToUpper(clr.getCenter().getCoordinate(1) * Parameters.getGenerateImagesSize()), centerColor.getRGB());
+			if(Utils.roundToUpper(clr.getCenter().getCoordinate(0) * Parameters.getGenerateImagesSize()) > 0 
+					&& Utils.roundToUpper(clr.getCenter().getCoordinate(0) * Parameters.getGenerateImagesSize()) 
+					< (imageRepresentation.getWidth() - 1)
+					&& Utils.roundToUpper(clr.getCenter().getCoordinate(1) * Parameters.getGenerateImagesSize()) > 0
+					&& Utils.roundToUpper(clr.getCenter().getCoordinate(1) * Parameters.getGenerateImagesSize()) 
+					< (imageRepresentation.getHeight() - 1))
 			{
 				//draw X sign
-				imageRepresentation.setRGB(Utils.roundToUpper(clr.getCenter().getCoordinate(0) + 1), 
-						Utils.roundToUpper(clr.getCenter().getCoordinate(1) + 1), centerColor.getRGB());
-				imageRepresentation.setRGB(Utils.roundToUpper(clr.getCenter().getCoordinate(0) + 1), 
-						Utils.roundToUpper(clr.getCenter().getCoordinate(1) - 1), centerColor.getRGB());
-				imageRepresentation.setRGB(Utils.roundToUpper(clr.getCenter().getCoordinate(0) - 1), 
-						Utils.roundToUpper(clr.getCenter().getCoordinate(1) - 1), centerColor.getRGB());
-				imageRepresentation.setRGB(Utils.roundToUpper(clr.getCenter().getCoordinate(0) - 1), 
-						Utils.roundToUpper(clr.getCenter().getCoordinate(1) + 1), centerColor.getRGB());				
+				imageRepresentation.setRGB(Utils.roundToUpper(clr.getCenter().getCoordinate(0) 
+						* Parameters.getGenerateImagesSize() + 1), 
+						Utils.roundToUpper(clr.getCenter().getCoordinate(1) * Parameters.getGenerateImagesSize() + 1), 
+						centerColor.getRGB());
+				imageRepresentation.setRGB(Utils.roundToUpper(clr.getCenter().getCoordinate(0) 
+						* Parameters.getGenerateImagesSize() + 1), 
+						Utils.roundToUpper(clr.getCenter().getCoordinate(1) * Parameters.getGenerateImagesSize() - 1), 
+						centerColor.getRGB());
+				imageRepresentation.setRGB(Utils.roundToUpper(clr.getCenter().getCoordinate(0) 
+						* Parameters.getGenerateImagesSize() - 1), 
+						Utils.roundToUpper(clr.getCenter().getCoordinate(1) * Parameters.getGenerateImagesSize() - 1), 
+						centerColor.getRGB());
+				imageRepresentation.setRGB(Utils.roundToUpper(clr.getCenter().getCoordinate(0) 
+						* Parameters.getGenerateImagesSize() - 1), 
+						Utils.roundToUpper(clr.getCenter().getCoordinate(1) * Parameters.getGenerateImagesSize() + 1), 
+						centerColor.getRGB());				
 			}
 		}
 	}

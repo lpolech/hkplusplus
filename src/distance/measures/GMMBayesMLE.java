@@ -13,8 +13,6 @@ public class GMMBayesMLE implements Measure {
 	
 	@Override
 	public double distance(Cluster cluster, DataPoint point) { //funkcja gestosci rozkladu normalnego (pdf)
-		Matrix x = point.getMatrix();
-		Matrix miu = cluster.getCenter().getMatrix();
 		double covarianceDet = cluster.getCovariance().det();
 		if(Double.isInfinite(covarianceDet) || Double.isNaN(covarianceDet))
 		{
@@ -45,11 +43,19 @@ public class GMMBayesMLE implements Measure {
 		
 		
 		double firstFactor = revOfSqrtOfPoweredDoublePi / Math.sqrt(covarianceDet);
+		
+		Matrix x = point.getMatrix();
+		Matrix miu = cluster.getCenter().getMatrix();
 		Matrix expFunctionExponent = x.minus(miu); //TODO dla lepszego debuggingu rozpisuje krokami
+		x = null;
+		miu = null;
+		
 		Matrix notTransposedFactor = expFunctionExponent.copy();
 		expFunctionExponent = expFunctionExponent.transpose();
 		expFunctionExponent = expFunctionExponent.times(covarianceInversion);
+		covarianceInversion = null;
 		expFunctionExponent = expFunctionExponent.times(notTransposedFactor);
+		notTransposedFactor = null;
 		expFunctionExponent = expFunctionExponent.times(-0.5);
 		
 		if((expFunctionExponent.getColumnDimension() != expFunctionExponent.getRowDimension()) && expFunctionExponent.getRowDimension() != 1)
@@ -58,7 +64,9 @@ public class GMMBayesMLE implements Measure {
 					+ expFunctionExponent.getColumnDimension() + " row: " + expFunctionExponent.getRowDimension());
 		}
 		
-		double secondFactor = Math.exp(expFunctionExponent.get(0, 0));
+		double expFunctionExponentValue = expFunctionExponent.get(0, 0);
+		expFunctionExponent = null;
+		double secondFactor = Math.exp(expFunctionExponentValue);
 		double returnValue = (firstFactor*secondFactor);
 		if(Parameters.isVerbose() && Double.isInfinite(returnValue) || Double.isNaN(returnValue))
 		{
@@ -69,7 +77,7 @@ public class GMMBayesMLE implements Measure {
 		{
 			System.out.println("GMMBayesMLE.distance calculated distance equals exactly 0.0! Return value: " + returnValue
 					+ " first factor: " + firstFactor + " second: " + secondFactor + ". It is not good, consider "
-					+ "increasing eplsilon and/ord little value. (expFunctionExponent.get(0, 0) = " + expFunctionExponent.get(0, 0));
+					+ "increasing eplsilon and/ord little value. (expFunctionExponent.get(0, 0) = " + expFunctionExponentValue);
 		}
 		return returnValue;
 	}

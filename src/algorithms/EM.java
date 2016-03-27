@@ -67,6 +67,11 @@ public class EM extends Common implements CenterMethod {
 		ClustPtsPostAndSumOfPost resultWithoutEmptyClusters = removeEmptyNonStaticClusters(clusterisation, clustersSumOfPosteriories, pointsToMixturePosteriories);
 		clusterisation = resultWithoutEmptyClusters.getClusterisation();
 		
+		if(Parameters.isClusterReestimationBasedOnItsData())
+		{
+			clusterisation = clusterReestimationBasedOnItsData(clusterisation);
+		}
+		
 //		System.out.println("=====================================pointsToMixturePosteriories======================================");
 //		for(int i = 0; i < pointsToMixturePosteriories.length; i++)
 //		{
@@ -83,13 +88,41 @@ public class EM extends Common implements CenterMethod {
 		return new ClustersAndTheirStatistics(clusterisation, measure.calculateClusterisationStatistic(clusterisation), true);
 	}
 
+	private Cluster[] clusterReestimationBasedOnItsData(Cluster[] clusterisation) {
+		for(int i = 0; i < clusterisation.length; i++)
+		{
+			if(!clusterisation[i].isStaticCenter())
+			{
+//				System.out.println(clusterisation[i]);
+//				System.out.println("\n");
+				clusterisation[i] = recalculateMiuBasedOnClusterData(clusterisation[i]);
+				clusterisation[i] = recalculateCovarianceOnClusterData(clusterisation[i]);
+//				System.out.println(clusterisation[i]);
+//				System.out.println("===========================");
+			}
+		}
+		return clusterisation;
+	}
+
+	private Cluster recalculateMiuBasedOnClusterData(Cluster cluster) {
+		DataPoint center = calculateAvgPointsCenter(cluster.getPoints());
+		cluster.setCenter(center);
+		return cluster;
+	}
+
+	private Cluster recalculateCovarianceOnClusterData(Cluster cluster) {
+		Matrix covariance = calculateSampleCovarianceMatrix(cluster.getPoints(), cluster.getCenter());
+		cluster.setCovariance(covariance);
+		return cluster;
+	}
+
 	private ClustPtsPostAndSumOfPost removeEmptyNonStaticClusters(Cluster[] clusterisation,
 			double[] clustersSumOfPosteriories, double[][] pointsToMixturePosteriories) {
 		boolean[] toRemove = new boolean[clusterisation.length];
 		int newClustersCounter = 0;
 		for(int i = 0; i < clusterisation.length; i++)
 		{
-			if(!clusterisation[i].isStaticCenter() && clusterisation[i].getPoints().length == 0 && !clusterisation[i].isStaticCenter())
+			if(!clusterisation[i].isStaticCenter() && clusterisation[i].getPoints().length == 0)
 			{
 				toRemove[i] = true;
 //				if(Parameters.isVerbose())
@@ -123,17 +156,17 @@ public class EM extends Common implements CenterMethod {
 		{
 			for(int j = 0; j < clusterisation.length; j++)
 			{
-				pointsToMixturesPosteriories[i][j] = calculateResponsibilityValue(pointsToMixturesProbabilities, parent, clusterisation, i, j);
+				pointsToMixturesPosteriories[i][j] = calculateResponsibilityValue(pointsToMixturesProbabilities, clusterisation, i, j);
 				if(pointsToMixturesPosteriories[i][j] == 0.0d)
 				{
 					numberOfZeroPosterioriProb++;
 				}
 			}
 		}
-		if(numberOfZeroPosterioriProb > 0)
-		{
-			System.out.println("Number of zero prob: " + numberOfZeroPosterioriProb);
-		}
+//		if(numberOfZeroPosterioriProb > 0)
+//		{
+//			System.out.println("Number of zero prob: " + numberOfZeroPosterioriProb);
+//		}
 		return pointsToMixturesPosteriories;
 	}
 	
@@ -283,7 +316,7 @@ public class EM extends Common implements CenterMethod {
 	}
 
 	private double calculateResponsibilityValue(
-			double[][] pointsToMixturesProbabilities, Cluster parent,
+			double[][] pointsToMixturesProbabilities,
 			Cluster[] clusterisation, int pointNumber, int mixtureNumber) {
 		double posterioriNum = clusterisation[mixtureNumber].getMixingCoefficient()*pointsToMixturesProbabilities[pointNumber][mixtureNumber];
 		double posterioriDen = 0.0d;
@@ -293,9 +326,12 @@ public class EM extends Common implements CenterMethod {
 			posterioriDen += clusterisation[i].getMixingCoefficient()*pointsToMixturesProbabilities[pointNumber][i];
 		}
 		returnValue = posterioriNum/posterioriDen;
-		//TODO: poni¿sze dwie linijki sa modyfikacja!
-		if(clusterisation[mixtureNumber].isStaticCenter())
+		
+		if(Parameters.isStaticCenterResponsibilityScalling() 
+				&& clusterisation[mixtureNumber].isStaticCenter())
+		{
 			returnValue *= Parameters.getResponsibilityScallingFactor();
+		}
 		
 		if(Double.isInfinite(returnValue) || Double.isNaN(returnValue))
 		{
@@ -334,7 +370,7 @@ public class EM extends Common implements CenterMethod {
 		{
 			if(!clusterisation[i].isStaticCenter())
 			{
-				newMiu = new DataPoint(new double[DataPoint.getNumberOfDimensions()], "miu");
+				newMiu = new DataPoint(new double[DataPoint.getNumberOfDimensions()], null, "miu");
 				for(int j = 0; j < DataPoint.getNumberOfDimensions(); j++)
 				{
 					newMiuCoordinateValue = 0.0d;
@@ -381,14 +417,21 @@ public class EM extends Common implements CenterMethod {
 					System.out.println("EM.recalculateCovarianceMatrices() sum matrix multiplied by calculation constant have not finite value! newCovariancenewCovariance matrix values:");
 					System.out.println(newCovariance.get(0, 0) + " " + newCovariance.get(0, 1) + "\n" + newCovariance.get(1, 0) + " " + newCovariance.get(1, 1));
 				}
+
+				if(Parameters.isDiagonalCovarianceMatrix())
+				{
+					newCovariance = Utils.getDiagonalMatrix(newCovariance);
+				}
+				
 				clusterisation[i].setCovariance(newCovariance);		
 			}
 		}
 		return clusterisation;
 	}
 
-	private Cluster[] createInitialMixtures(int k, Cluster parent) {//https://www.youtube.com/watch?v=BWXd5dOkuTo&feature=player_detailpage#t=628 poczatkowe mikstury beda podobne do tych, jakie powinny byc, aby uzyskac klasteryzacje kmeans
-		//TODO mozna rozkminic jeszcze inicjalizacje KMEANS liyteratura podaje, ze ponizsza metoda ma duze prawdopodobienstwo utkniecia w min. lokalnym
+	private Cluster[] createInitialMixtures(int k, Cluster parent) {//https://www.youtube.com/watch?v=BWXd5dOkuTo&feature=player_detailpage#t=628 
+		//poczatkowe mikstury beda podobne do tych, jakie powinny byc, aby uzyskac klasteryzacje kmeans
+		//TODO mozna rozkminic jeszcze inicjalizacje KMEANS literatura podaje, ze ponizsza metoda ma duze prawdopodobienstwo utkniecia w min. lokalnym
 		DataPoint[] centers = choseSeedPoints(k, parent);//poczatkowe srednie sa z danych
 		Cluster[] clusters;
 		
@@ -404,22 +447,28 @@ public class EM extends Common implements CenterMethod {
 			priori = (double) (1.0/(double)(k+1));//rowne prawdopodobienstwo apriori FIXME takie priori sie sumuje do 1 ale POMIJA PRIORI Z PARENTA! Trzeba sie nad tym zastanowic
 		}
 		
-		Matrix covariance = parent.getCovariance().copy();//stala wariancja rowna wariancji z parenta
-		
 		for(int i = 0; i < k; i++)
 		{
-			clusters[i] = new Cluster(null, centers[i], covariance, priori, null, parent.getClusterId(), Utils.getNextId());
+			clusters[i] = new Cluster(null, centers[i], parent.getCovariance().copy(), priori, null, parent.getClusterId(), Utils.getNextId());
 		}
 		
 		if(!Parameters.isDisableStaticCenter())
 		{
-			//TODO: pierwotna wersja
-			clusters[k] = new Cluster(null, parent.getCenter(), parent.getCovariance(), priori, parent.getColorOnImage(), parent.getClusterId(), parent.getClusterId());
-			//adaptacyjna maciez kowariancji 
-			//clusters[k] = new Cluster(null, parent.getCenter(), parent.getCovariance().times(1.0/priori), priori, parent.getColorOnImage(), parent.getClusterId(), parent.getClusterId());// FIXME trzeba rozkminic jakie dac tutaj priori! 
-			//macierz kowariancji skalowana parametrem
-//			clusters[k] = new Cluster(null, parent.getCenter(), parent.getCovariance().times(1.0/Parameters.getResponsibilityScallingFactor()),
-//					priori, parent.getColorOnImage(), parent.getClusterId(), parent.getClusterId());// FIXME trzeba rozkminic jakie dac tutaj priori!
+			if(Parameters.isStaticCenterAdaptiveCovarianve())
+			{
+				clusters[k] = new Cluster(null, parent.getCenter(), parent.getCovariance().times(1.0/priori), priori, parent.getColorOnImage(),
+						parent.getParentId(), parent.getClusterId());// FIXME trzeba rozkminic jakie dac tutaj priori! 
+			}
+			else if(Parameters.isStaticCenterCovarianceScalling())
+			{
+				clusters[k] = new Cluster(null, parent.getCenter(), parent.getCovariance().times(1.0/Parameters.getCovarianceScallingFactor()),
+						priori, parent.getColorOnImage(), parent.getParentId(), parent.getClusterId());// FIXME trzeba rozkminic jakie dac tutaj priori!
+			}
+			else
+			{
+				clusters[k] = new Cluster(null, parent.getCenter(), parent.getCovariance(), priori, parent.getColorOnImage(), 
+						parent.getParentId(), parent.getClusterId());
+			}
 			clusters[k].setStaticCenter(true);
 		}
 		return clusters;
@@ -471,31 +520,31 @@ public class EM extends Common implements CenterMethod {
 	//from interface CenterMethod
 	@Override
 	public Cluster makeCluster(Data points, Measure measure) {
-		DataPoint center = calculateAvgPointsCenter(points);
-		Matrix covariance = calculateSampleCovarianceMatrix(points, center);
+		DataPoint center = calculateAvgPointsCenter(points.getPoints());
+		Matrix covariance = calculateSampleCovarianceMatrix(points.getPoints(), center);
 		int rootId = Utils.getNextId();
 		Cluster root = new Cluster(points.getPoints(), center, covariance, 1.0d, ColorPalette.getNextColor(), rootId, rootId);	
 //		System.out.println(root);
 		return root;
 	}
 
-	private DataPoint calculateAvgPointsCenter(Data points) {
-		DataPoint center = new DataPoint(new double[DataPoint.getNumberOfDimensions()], "miu");
+	private DataPoint calculateAvgPointsCenter(DataPoint[] points) {
+		DataPoint center = new DataPoint(new double[DataPoint.getNumberOfDimensions()], null, "miu");
 		double newCoordinateVal;
 		for(int i = 0; i < DataPoint.getNumberOfDimensions(); i++)
 		{
 			newCoordinateVal = 0.0d;
-			for(int j = 0; j < points.getNumberOfPoints(); j++)
+			for(int j = 0; j < points.length; j++)
 			{
-				newCoordinateVal += points.getPoints()[j].getCoordinate(i);
+				newCoordinateVal += points[j].getCoordinate(i);
 			}
-			newCoordinateVal /= points.getNumberOfPoints();
+			newCoordinateVal /= points.length;
 			center.setCoordinate(i, newCoordinateVal);
 		}
 		return center;
 	}
 	
-	private Matrix calculateSampleCovarianceMatrix(Data points, DataPoint center) {
+	private Matrix calculateSampleCovarianceMatrix(DataPoint[] points, DataPoint center) {
 		double[][] covarianceMatrixValues = new double[DataPoint.getNumberOfDimensions()][DataPoint.getNumberOfDimensions()];
 		
 		double covariance;
@@ -504,13 +553,16 @@ public class EM extends Common implements CenterMethod {
 			for(int j = 0; j < DataPoint.getNumberOfDimensions(); j++)
 			{
 				covariance = 0.0;
-				for(int k = 0; k < points.getNumberOfPoints(); k++)
+				if(!(Parameters.isDiagonalCovarianceMatrix() && i != j))
 				{
-					covariance += (points.getPoints()[k].getCoordinate(i)-center.getCoordinate(i))*
-							(points.getPoints()[k].getCoordinate(j)-center.getCoordinate(j));
+					for(int k = 0; k < points.length; k++)
+					{
+						covariance += (points[k].getCoordinate(i)-center.getCoordinate(i))*
+								(points[k].getCoordinate(j)-center.getCoordinate(j));
+					}
 				}
 				//TODO n-1 poniewaz kowariancja próbki a nie populacji
-				covariance /= (points.getNumberOfPoints()-1);
+				covariance /= (points.length-1);
 				covarianceMatrixValues[i][j] = covariance;
 			}
 		}

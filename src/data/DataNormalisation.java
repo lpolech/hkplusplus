@@ -1,19 +1,18 @@
 package data;
 
 public class DataNormalisation {
-	public static DataPoint[] normalise(DataPoint[] inputData)
+	public static DataPoint[] normalise(DataPoint[] inputData, DataStatistics dataStats)
 	{
 		examineData(inputData);
 		
 		DataPoint[] normalisedData = null;
-		double[][] minAndMaxValuesOfEachDim = determineMinAndMaxValuesForEachDim(inputData);
-		normalisedData = transformData(inputData, minAndMaxValuesOfEachDim);
+		normalisedData = transformData(inputData, dataStats);
 		
 		return normalisedData;
 	}
 
 	private static DataPoint[] transformData(DataPoint[] inputData,
-			double[][] minAndMaxValuesOfEachDim) {
+			DataStatistics dataStats) {
 		DataPoint[] transformedData = new DataPoint[inputData.length];
 		
 		for(int i = 0; i < transformedData.length; i++)
@@ -21,59 +20,25 @@ public class DataNormalisation {
 			double[] normalisedCoordinates = new double[DataPoint.getNumberOfDimensions()];
 			for(int j = 0; j < DataPoint.getNumberOfDimensions(); j++)
 			{
-				if(minAndMaxValuesOfEachDim[1][j] != minAndMaxValuesOfEachDim[0][j])
+				if(dataStats.getMinValues()[j] != dataStats.getMaxValues()[j])
 				{
-					normalisedCoordinates[j] = (inputData[i].getCoordinate(j) - minAndMaxValuesOfEachDim[0][j])
-							/ (minAndMaxValuesOfEachDim[1][j] - minAndMaxValuesOfEachDim[0][j]);
+					normalisedCoordinates[j] = (inputData[i].getCoordinate(j) - dataStats.getMinValues()[j])
+							/ (dataStats.getMaxValues()[j] - dataStats.getMinValues()[j]);
 				}
-				else if(minAndMaxValuesOfEachDim[1][j] == minAndMaxValuesOfEachDim[0][j])
+				else if(dataStats.getMaxValues()[j] == dataStats.getMinValues()[j])
 				{
 					normalisedCoordinates[j] = 0;
 				}
 				else
 				{
-					System.err.println("Something went wrong with minAndMaxValuesOfEachDim[1][j] and/or minAndMaxValuesOfEachDim[0][j]"
-							+ " Values are: " + minAndMaxValuesOfEachDim[1][j] + " and "+ minAndMaxValuesOfEachDim[0][j]);
+					System.err.println("Something went wrong with dataStats.getMaxValues()[j] and/or getMinValues()[j]"
+							+ " Values are: " + dataStats.getMaxValues()[j] + " and "+ dataStats.getMinValues()[j]);
 					System.exit(1);
 				}
 			}
-			transformedData[i] = new DataPoint(normalisedCoordinates, inputData[i].getClassAttribute());
+			transformedData[i] = new DataPoint(normalisedCoordinates, inputData[i].getSourceCoordinates(), inputData[i].getClassAttribute());
 		}
 		return transformedData;
-	}
-
-	private static double[][] determineMinAndMaxValuesForEachDim(
-			DataPoint[] inputData) {
-		double[][] minAndMaxValues = new double[2][DataPoint.getNumberOfDimensions()];
-		
-		for(int i = 0; i < DataPoint.getNumberOfDimensions(); i++)
-		{
-			double minValue = Double.MAX_VALUE;
-			double maxValue = (-1)*Double.MAX_VALUE;
-			for(int j = 0; j < inputData.length; j++)
-			{
-				double value = inputData[j].getCoordinate(i);
-				if(value < minValue)
-				{
-					minValue = value;
-				}
-				
-				if(value > maxValue)
-				{
-					maxValue = value;
-				}
-			}
-			minAndMaxValues[0][i] = minValue;
-			minAndMaxValues[1][i] = maxValue;
-			
-			if(minValue == maxValue)
-			{
-				System.err.println("DataNormalisation.determineMinAndMaxValuesForEachDim(..) Warning, found min and max values are equal!"
-						+ " This means, that on dimension number " + i + " there is no diferent values.");
-			}
-		}
-		
-		return minAndMaxValues;
 	}
 
 	private static void examineData(DataPoint[] inputData) {

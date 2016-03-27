@@ -7,6 +7,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import Jama.Matrix;
 import data.Parameters;
 
 public class Utils {
@@ -88,5 +89,20 @@ public class Utils {
 	public static double getTimerInHours()
 	{
 		return (double)(timerStop/1_000_000_000)/3600;
+	}
+
+	public static Matrix getDiagonalMatrix(Matrix m) {
+		Matrix returnMatrix = m.copy();
+		for(int i = 0; i < m.getColumnDimension(); i++)
+		{
+			for(int j = 0; j < m.getRowDimension(); j++)
+			{
+				if(j != i)
+				{
+					returnMatrix.set(j, i, 0.0);
+				}
+			}
+		}
+		return returnMatrix;
 	}
 }

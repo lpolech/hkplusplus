@@ -6,12 +6,21 @@ import Jama.Matrix;
 public class DataPoint {
 	private static int numberOfDimensions;
 	private double[] coordinates;
+	private double[] sourceCoordinates;
 	private String classAttribute;
 	
-	public DataPoint(double[] coordinates, String classAttribute)
+	public DataPoint(double[] coordinates, double[] sourceCoordinates, String classAttribute)
 	{
 		this.setCoordinates(coordinates);
 		this.setClassAttribute(classAttribute);
+		if(sourceCoordinates != null)
+		{
+			this.setSourceCoordinates(sourceCoordinates);
+		}
+		else
+		{
+			this.sourceCoordinates = null;
+		}
 	}
 	
 	public double getCoordinate(int number)
@@ -22,6 +31,21 @@ public class DataPoint {
 	public void setCoordinates(double[] coordinates)
 	{
 		this.coordinates = coordinates.clone();
+	}
+	
+	public double[] getSourceCoordinates()
+	{
+		return sourceCoordinates;
+	}
+	
+	public double getSourceCoordinate(int number)
+	{
+		return sourceCoordinates[number];
+	}
+	
+	public void setSourceCoordinates(double[] sourceCoordinates)
+	{
+		this.sourceCoordinates = sourceCoordinates.clone();
 	}
 	
 	public void setCoordinate(int number, double value)
@@ -69,6 +93,16 @@ public class DataPoint {
 		{
 			returnValue += coordinates[i];
 			returnValue += Constans.delimiter;
+		}
+		
+		if(sourceCoordinates != null)
+		{
+			returnValue += Constans.delimiter + "Source:" + Constans.delimiter;
+			for(int i = 0; i < numberOfDimensions; i++)
+			{
+				returnValue += sourceCoordinates[i];
+				returnValue += Constans.delimiter;
+			}
 		}
 		return returnValue;
 	}
