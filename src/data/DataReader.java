@@ -55,36 +55,30 @@ public class DataReader {
 		{
 			if(scanner.hasNextLine())
 			{
-				pointsAndDimension = parseHeader(scanner.nextLine());
+				String firstLine = scanner.nextLine();
+				int numberOfPoints = 1;
+				String[] splittedFileFirstLine = firstLine.split(Constans.delimiter);
+				int numberOfAttributes = splittedFileFirstLine.length - (Parameters.isClassAttribute()? 1 : 0) - (Parameters.isInstanceName()? 1 : 0);
+				pointsAndDimension.setDataDimension(numberOfAttributes);
+				
+				while(scanner.hasNextLine())
+				{
+					scanner.nextLine();
+					numberOfPoints++;
+				}
+				
+				pointsAndDimension.setNumberOfPoints(numberOfPoints);
 			}
 			else
 			{
-				System.err.println("Input file do not have header with numberOfPoints"	+ Constans.delimiter 
-						+ "numberOfDimensions!");
+				System.err.println("Cannot predict number of data dimensions based on the first line of input file OR"
+						+ " cannot count the number of points in datafile.");
 				System.exit(1);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return pointsAndDimension;
-	}
-
-	private static NumberOfPointsAndDataDimension parseHeader(String fileHeader) {
-		String[] splittedFileHeader = fileHeader.split(Constans.delimiter);
-		int numberOfPoints = 0;
-		int numberOfDimensions = 0;
-		if(splittedFileHeader.length == 2)
-		{
-			numberOfPoints = Integer.valueOf(splittedFileHeader[0]);
-			numberOfDimensions = Integer.valueOf(splittedFileHeader[1]);
-		}
-		else
-		{
-			System.err.println("Input file header " + fileHeader + " don't fit pattern numberOfPoints" 
-					+ Constans.delimiter + "numberOfDimensions!");
-			System.exit(1);
-		}
-		return new NumberOfPointsAndDataDimension(numberOfPoints, numberOfDimensions);
 	}
 	
 	private static DataPoint[] readAndParseDataPoints(Path inputFilePath,
@@ -96,12 +90,11 @@ public class DataReader {
 		
 		try(Scanner scanner = new Scanner(inputFilePath))
 		{
-			skipAlreadyParsedHeader(scanner);
 			while(scanner.hasNextLine())
 			{
 				String rawDataPoint = scanner.nextLine();
 				String[] dataPointValues = rawDataPoint.split(Constans.delimiter);
-				if(dataPointValues.length != (numberOfDimension + (Parameters.isClassAttribute()? 1 : 0)))
+				if(dataPointValues.length != (numberOfDimension + (Parameters.isClassAttribute()? 1 : 0) + (Parameters.isInstanceName()? 1 : 0)))
 				{
 					System.err.println("Read line " + rawDataPoint + " from " + inputFilePath 
 							+ " don't have proper points coordinates and/or class attribute!");
@@ -125,16 +118,29 @@ public class DataReader {
 		double[] coordinates = new double[numberOfDimension];
 		
 		String classAttribute = "void";
+		String instanceName = "void";
 		if(Parameters.isClassAttribute())
 		{
 			classAttribute = dataPointValues[0];
+		}
+		
+		if(Parameters.isInstanceName())
+		{
+			if(Parameters.isClassAttribute())
+			{
+				instanceName = dataPointValues[1];
+			}
+			else
+			{
+				instanceName = dataPointValues[0];
+			}
 		}
 		
 		for(int i = 0; i < numberOfDimension; i++)
 		{
 			try
 			{
-				coordinates[i] = Double.valueOf(dataPointValues[i + (Parameters.isClassAttribute()? 1 : 0)]);
+				coordinates[i] = Double.valueOf(dataPointValues[i + (Parameters.isClassAttribute()? 1 : 0) + (Parameters.isInstanceName()? 1 : 0)]);
 			}
 			catch(NumberFormatException e)
 			{
@@ -142,7 +148,7 @@ public class DataReader {
 				System.exit(1);
 			}
 		}
-		data[readPointsCounter] = new DataPoint(coordinates, coordinates, classAttribute);
+		data[readPointsCounter] = new DataPoint(coordinates, coordinates, instanceName, classAttribute);
 	}
 
 	private static HashMap<Integer, String> readAndParseDimensionsNames(
@@ -183,10 +189,6 @@ public class DataReader {
 		Integer dim = Integer.valueOf(splittedLine[0]);
 		String name = splittedLine[1];
 		dimensionNumberAndItsName.put(dim, name);
-	}
-
-	private static void skipAlreadyParsedHeader(Scanner scanner) {
-		scanner.nextLine();
 	}
 	
 	private static DataStatistics calculateDataStatistics(

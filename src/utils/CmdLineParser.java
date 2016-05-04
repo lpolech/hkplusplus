@@ -151,6 +151,8 @@ public class CmdLineParser {
 				+ "then recall, precision and F-Measure will be calculated for each dendrogram level and for whole dednrogram. See \"Fast "
 				+ "and effective text mining using linear-time "
 				+ "document clustering\" by B. Larsen and C. Aone (1999)");
+		options.addOption("in", "instance-name", false, "indicates that SECOND (if class attribute is present) or FIRST (otherwise) column"
+				+ " is the name of every instance.");
 		options.addOption("ds", "disable-static-center", false, "disable feature of placing static (backgroud) center while going down in "
 				+ "hierarchy");
 		options.addOption("scrs", "static-center-resposibility-scalling", false, "scale responibility value from static centers to points, "
@@ -225,6 +227,8 @@ public class CmdLineParser {
 		Parameters.setMethod(parseMethod());
 		
 		Parameters.setClassAttribute(cmd.hasOption('c'));
+		
+		Parameters.setInstanceName(cmd.hasOption("in"));
 		
 		Parameters.setDisableStaticCenter(cmd.hasOption("ds"));
 

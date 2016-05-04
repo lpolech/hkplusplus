@@ -99,11 +99,11 @@ public class GMMBayesMLE implements Measure {
 				covariance.set(i, i, covMatrixDiagValue);
 			}
 		}
-//		if(Parameters.isVerbose())
-//		{
-//			System.err.println(" Cov. matrix diagonal was increased by " + sumOfAddedValues
-//					+ " number of increasings: " + increaseCounter);
-//		}
+		if(Parameters.isVerbose())
+		{
+			System.err.println(" Cov. matrix diagonal was increased by " + sumOfAddedValues
+					+ " number of increasings: " + increaseCounter);
+		}
 		return cluster;
 	}
 

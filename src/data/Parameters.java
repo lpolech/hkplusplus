@@ -17,6 +17,7 @@ public class Parameters {
 	private static double epsilon;
 	private static double littleValue;
 	private static boolean classAttribute;
+	private static boolean instanceName;
 	private static int generatedImgsSize;
 	private static boolean disableStaticCenter;
 	private static int maxNumberOfNodes;
@@ -208,6 +209,14 @@ public class Parameters {
 	
 	public static void setClusterReestimationBasedOnItsData(boolean clusterReestimationBasedOnItsData) {
 		Parameters.clusterReestimationBasedOnItsData = clusterReestimationBasedOnItsData;
+	}
+
+	public static boolean isInstanceName() {
+		return instanceName;
+	}
+
+	public static void setInstanceName(boolean instanceName) {
+		Parameters.instanceName = instanceName;
 	}
 
 }

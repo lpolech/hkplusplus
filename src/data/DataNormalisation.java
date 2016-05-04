@@ -36,7 +36,8 @@ public class DataNormalisation {
 					System.exit(1);
 				}
 			}
-			transformedData[i] = new DataPoint(normalisedCoordinates, inputData[i].getSourceCoordinates(), inputData[i].getClassAttribute());
+			transformedData[i] = new DataPoint(normalisedCoordinates, inputData[i].getSourceCoordinates(), inputData[i].getInstanceName(), 
+					inputData[i].getClassAttribute());
 		}
 		return transformedData;
 	}

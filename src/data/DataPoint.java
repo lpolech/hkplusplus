@@ -8,11 +8,13 @@ public class DataPoint {
 	private double[] coordinates;
 	private double[] sourceCoordinates;
 	private String classAttribute;
+	private String instanceName;
 	
-	public DataPoint(double[] coordinates, double[] sourceCoordinates, String classAttribute)
+	public DataPoint(double[] coordinates, double[] sourceCoordinates, String instanceName, String classAttribute)
 	{
 		this.setCoordinates(coordinates);
 		this.setClassAttribute(classAttribute);
+		this.setInstanceName(instanceName);
 		if(sourceCoordinates != null)
 		{
 			this.setSourceCoordinates(sourceCoordinates);
@@ -89,6 +91,12 @@ public class DataPoint {
 					+ Constans.delimiter + Constans.delimiter;
 		}
 		
+		if(Parameters.isInstanceName())
+		{
+			returnValue += "InstName: " + Constans.delimiter + instanceName 
+					+ Constans.delimiter + Constans.delimiter;
+		}
+		
 		for(int i = 0; i < numberOfDimensions; i++)
 		{
 			returnValue += coordinates[i];
@@ -125,5 +133,13 @@ public class DataPoint {
 
 	public void setClassAttribute(String classAttribute) {
 		this.classAttribute = classAttribute;
+	}
+
+	public String getInstanceName() {
+		return instanceName;
+	}
+
+	public void setInstanceName(String instanceName) {
+		this.instanceName = instanceName;
 	}
 }

@@ -14,22 +14,23 @@ public class Main {
 		//L = {5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5}
 		//E = {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5}
 		args = new String[]{
-				"-i", "balancedTree5000.csv",//"easy3Simply.txt",
+				"-i", "Edge_tool.sbowSIMPLE.csv",//"Edge_tool.sbowSIMPLE_BINARY_SEARCH/365.csv",//"easy3Simply.txt",
 //				"-h",
 				"-gmm",
-				"-s", "4",
-//				"-v",
-				"-o", "optymalizacje",//.concat(String.valueOf(L)).concat("_E").concat(String.valueOf(E)),
-				"-k", "4",
-				"-n", "20",//40//60 back
-				"-r", "20",//10 //60 back
+				"-s", "2",
+				"-v",
+				"-o", "edgeSIMPLE",//.concat(String.valueOf(L)).concat("_E").concat(String.valueOf(E)),
+				"-k", "2",
+				"-n", "2",//40//60 back
+				"-r", "22",//10 //60 back
 //				"-d", "testowe.list",
-				"-e", "15",
-				"-l", "4",
+				"-e", "10",
+				"-l", "0",
 				"-c",
 				"-dm",
 				"-gi", //"666",
 				"-w", "2147483600",
+				"-in",
 //				"-nn",
 //				"-ds",
 //				"-scac",

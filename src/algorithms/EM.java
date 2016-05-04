@@ -51,7 +51,7 @@ public class EM extends Common implements CenterMethod {
 		
 		while(stopCriterionNotMet(iterationNumber))
 		{
-			//ponizsze 2 linijki tak w zasadzie rowniez odnosza sie do kloku M, ale dla efektywnosci obliczeniowej robie je tutaj
+			//these two lines below are the elements of Maximization step, but for performance reasons they are here
 			pointsToMixturePosteriories = calculateEachPointToEachMixturePosterioriProb(parent, clusterisation);
 			clustersSumOfPosteriories = calculateSumOfAllPointsResponsibility(parent, clusterisation, pointsToMixturePosteriories);
 			
@@ -304,7 +304,7 @@ public class EM extends Common implements CenterMethod {
 			if(bestMixtureIndex ==  -1)
 			{
 				System.err.println("EM.expectation cannot find pointsToMixturePosteriories for point : " + parent.getPoints()[i] + " which has value!"
-						+ " Probabli each pointsToMixturePosteriories[i][j] has value: " + pointsToMixturePosteriories[i][0] + " pobabily it is due to "
+						+ " Probabily each pointsToMixturePosteriories[i][j] has value: " + pointsToMixturePosteriories[i][0] + " pobabily it is due to "
 						+ "wrong value of E or/and L parameter values. E = " + Parameters.getEpsilon() + " L = " + Parameters.getLittleValue());
 				System.exit(1);
 			}
@@ -370,7 +370,7 @@ public class EM extends Common implements CenterMethod {
 		{
 			if(!clusterisation[i].isStaticCenter())
 			{
-				newMiu = new DataPoint(new double[DataPoint.getNumberOfDimensions()], null, "miu");
+				newMiu = new DataPoint(new double[DataPoint.getNumberOfDimensions()], null, "miu", "miu");
 				for(int j = 0; j < DataPoint.getNumberOfDimensions(); j++)
 				{
 					newMiuCoordinateValue = 0.0d;
@@ -430,9 +430,8 @@ public class EM extends Common implements CenterMethod {
 	}
 
 	private Cluster[] createInitialMixtures(int k, Cluster parent) {//https://www.youtube.com/watch?v=BWXd5dOkuTo&feature=player_detailpage#t=628 
-		//poczatkowe mikstury beda podobne do tych, jakie powinny byc, aby uzyskac klasteryzacje kmeans
-		//TODO mozna rozkminic jeszcze inicjalizacje KMEANS literatura podaje, ze ponizsza metoda ma duze prawdopodobienstwo utkniecia w min. lokalnym
-		DataPoint[] centers = choseSeedPoints(k, parent);//poczatkowe srednie sa z danych
+		//TODO we could initialise this algorithm by using a k-means method
+		DataPoint[] centers = choseSeedPoints(k, parent);//initial centers are estimated directly from data
 		Cluster[] clusters;
 		
 		double priori;
@@ -444,7 +443,8 @@ public class EM extends Common implements CenterMethod {
 		else
 		{
 			clusters = new Cluster[k+1];
-			priori = (double) (1.0/(double)(k+1));//rowne prawdopodobienstwo apriori FIXME takie priori sie sumuje do 1 ale POMIJA PRIORI Z PARENTA! Trzeba sie nad tym zastanowic
+			//FIXME this apriori sums up to 1 but SKIPS parent (static center) apriori. Someone could re-think about it some day.
+			priori = (double) (1.0/(double)(k+1));//equal aprioris 
 		}
 		
 		for(int i = 0; i < k; i++)
@@ -457,12 +457,12 @@ public class EM extends Common implements CenterMethod {
 			if(Parameters.isStaticCenterAdaptiveCovarianve())
 			{
 				clusters[k] = new Cluster(null, parent.getCenter(), parent.getCovariance().times(1.0/priori), priori, parent.getColorOnImage(),
-						parent.getParentId(), parent.getClusterId());// FIXME trzeba rozkminic jakie dac tutaj priori! 
+						parent.getParentId(), parent.getClusterId());// FIXME what appriori assigns here? Maybe there is a better way.
 			}
 			else if(Parameters.isStaticCenterCovarianceScalling())
 			{
 				clusters[k] = new Cluster(null, parent.getCenter(), parent.getCovariance().times(1.0/Parameters.getCovarianceScallingFactor()),
-						priori, parent.getColorOnImage(), parent.getParentId(), parent.getClusterId());// FIXME trzeba rozkminic jakie dac tutaj priori!
+						priori, parent.getColorOnImage(), parent.getParentId(), parent.getClusterId());// FIXME what appriori assigns here? Maybe there is a better way.
 			}
 			else
 			{
@@ -484,7 +484,7 @@ public class EM extends Common implements CenterMethod {
 			newMixturesWithMaxResp[i] = new MixtureNumberWithItsResponsibility(-1, -1);
 		}
 		
-		if(oldMixturesWithMaxResp.length > 1)//zapewniam, ze tablice na starcie alg. beda ROZNE
+		if(oldMixturesWithMaxResp.length > 1)//ensure that the tables are different when used for the first time
 		{
 			oldMixturesWithMaxResp[0] = new MixtureNumberWithItsResponsibility(666, 666);
 		}
@@ -507,13 +507,14 @@ public class EM extends Common implements CenterMethod {
 		boolean returnValue = true;
 		for(int i = 0; i < oldMixturesWithMaxResp.length && returnValue; i++)
 		{
-			if(newMixturesWithMaxResp[i].getMixtureNumber() != oldMixturesWithMaxResp[i].getMixtureNumber()// dzieki takiemu poronaniu dajemy szanse miksturom na lepsze dopasowanie do danych
+			// thanks to that way of comparison, we allows algorithm to better fit the data
+			if(newMixturesWithMaxResp[i].getMixtureNumber() != oldMixturesWithMaxResp[i].getMixtureNumber()
 					|| newMixturesWithMaxResp[i].getResponsibility() != oldMixturesWithMaxResp[i].getResponsibility())
 			{
 				returnValue = false;
 			}
 		}
-		oldMixturesWithMaxResp = newMixturesWithMaxResp;//kopiowanie globalnych referencji
+		oldMixturesWithMaxResp = newMixturesWithMaxResp;//copy of global references
 		return returnValue;
 	}
 
@@ -529,7 +530,7 @@ public class EM extends Common implements CenterMethod {
 	}
 
 	private DataPoint calculateAvgPointsCenter(DataPoint[] points) {
-		DataPoint center = new DataPoint(new double[DataPoint.getNumberOfDimensions()], null, "miu");
+		DataPoint center = new DataPoint(new double[DataPoint.getNumberOfDimensions()], null, "miu", "miu");
 		double newCoordinateVal;
 		for(int i = 0; i < DataPoint.getNumberOfDimensions(); i++)
 		{

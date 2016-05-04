@@ -54,7 +54,6 @@ public class Dendrogram {
 	private AdaptedFmeasure adaptedFmeasureWithOUTInheritance;
 	private StandardFmeasure standardFmeasure;
 	private PartialOrderFmeasure partialOrderFscore;
-	public String dane;
 	
 	public Dendrogram(Data points, AlgEnum clusterisationMethod, int k, int levelsLimit, 
 			Path levelsImgsStorage)
@@ -197,21 +196,66 @@ public class Dendrogram {
 		Utils.stopTimer();
 		
 		System.out.print("Computing final statistics... ");
-		computeFinalResultStatistics(getDendrogramBottom());
+		Hierarchy h = computeFinalResultStatistics(getDendrogramBottom());
 		saveCompactSummaryStatistics(getDendrogramBottom(), levelNumber, Utils.getTimerInMinutes());
+		saveFinalHierarchyOfGroups(Constans.finalHierarchyOfGroupsFileName, this.getDendrogramBottom(), h);
 		System.out.println("Done.");
 		return dendrogram;
 	}
 	
-	private void computeFinalResultStatistics(DendrogramLevel dendrogramBottom) {
+	private void saveFinalHierarchyOfGroups(String finalHierarchyOfGroupsFilename,
+			DendrogramLevel dendrogramBottom, Hierarchy h) {
+		Path finalHierarchyOfGroupsFile = Utils.createCsvFileIfNotExists(finalHierarchyOfGroupsFilename);
+		
+		try (FileWriter result = new FileWriter(finalHierarchyOfGroupsFile.toString(), false)) 
+		{
+			if(h == null)
+			{
+				h = this.getHierarchyRepresentation();
+			}
+			
+			LinkedList<Instance> instances = h.getRoot().getSubtreeInstances();
+			for(DataPoint dp: this.points.getPoints())
+			{
+				boolean found = false;
+				for(int i = 0; i < instances.size() && !found; i++)
+				{
+					Instance inst = instances.get(i);
+					if(inst.getData() == dp.getSourceCoordinates())//the references should be the same, because no copy is done during program execution
+					{
+						found = true;
+						String trueClass = (inst.getTrueClass().equals("void")? "" : Constans.delimiter + inst.getTrueClass());
+						String instanceName = (inst.getInstanceName().equals("void")? "" : Constans.delimiter + inst.getInstanceName());
+						String resultFileLine = inst.getNodeId() + trueClass + instanceName;
+						
+						for(double coordinate: inst.getData())
+						{
+							resultFileLine += Constans.delimiter + coordinate;
+						}
+						
+						resultFileLine += "\n";
+						
+						result.write(resultFileLine);
+					}
+				}
+			}
+		} 
+		catch (IOException e) {
+			System.out.println("Dendrogram.saveFinalHierarchyOfGroups" + e);
+		}
+	}
+
+	private Hierarchy computeFinalResultStatistics(DendrogramLevel dendrogramBottom) {
 		double adaptedFmeasureWithInheritanceValue = Double.NaN;
 		double adaptedFmeasureWithOUTInheritanceValue = Double.NaN;
 		double standardFmeasureValue = Double.NaN;
 		double partialOrderFscoreValue = Double.NaN;
 		
+		Hierarchy h = null;
+		
 		if(Parameters.isClassAttribute())
 		{
-			Hierarchy h = getHierarchyRepresentation();
+			h = getHierarchyRepresentation();
 			adaptedFmeasureWithInheritanceValue = adaptedFmeasureWithInheritance.getMeasure(h);
 			adaptedFmeasureWithOUTInheritanceValue = adaptedFmeasureWithOUTInheritance.getMeasure(h);
 			standardFmeasureValue = standardFmeasure.getMeasure(h);
@@ -222,6 +266,8 @@ public class Dendrogram {
 		dendrogramBottom.getClusterisationStatistics().setAdaptedFmeasureWithOUTInheritance(adaptedFmeasureWithOUTInheritanceValue);
 		dendrogramBottom.getClusterisationStatistics().setStandardFmeasure(standardFmeasureValue);
 		dendrogramBottom.getClusterisationStatistics().setPartialOrderFscore(partialOrderFscoreValue);
+		
+		return h;
 	}
 
 	private void computeDendrogramStatistics(DendrogramLevel newLevel) {
@@ -403,7 +449,7 @@ public class Dendrogram {
 						if(!alreadyAssignedPoints.contains(p))
 						{
 							alreadyAssignedPoints.add(p);
-							instances.add(new BasicInstance(nodeId, p.getSourceCoordinates(), p.getClassAttribute()));
+							instances.add(new BasicInstance(p.getInstanceName(), nodeId, p.getSourceCoordinates(), p.getClassAttribute()));
 							if(Parameters.isClassAttribute())
 							{
 								String classAttrib = p.getClassAttribute();
