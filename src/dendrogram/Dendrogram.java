@@ -527,6 +527,7 @@ public class Dendrogram {
 			LinkedList<Node> children = elem.getKey().getChildren(); 
 			for(int i = 0; i < children.size(); i++)
 			{
+				@SuppressWarnings("unchecked")
 				LinkedList<Integer> childNameSkeletone = (LinkedList<Integer>) elem.getValue().clone();
 				childNameSkeletone.add(i);
 				s.push(new AbstractMap.SimpleEntry<BasicNode, LinkedList<Integer>>((BasicNode)children.get(i), childNameSkeletone));
