@@ -2,7 +2,8 @@ package algorithms;
 
 public enum AlgEnum {
 	KMEANS("Kmeans"),
-	GMM("GMM");
+	GMM("GMM"),
+	LOG_GMM("LOG_GMM");
 	
 	private final String algName;
 	

@@ -82,7 +82,7 @@ public class GMMBayesMLE implements Measure {
 		return returnValue;
 	}
 
-	private Cluster makeCovMatrixInvertible(Cluster cluster) {//TODO mo¿na rozkminiæ SVD i doac wartosc tylko do tego elementu na diagonalu, gdzie nalezy
+	protected Cluster makeCovMatrixInvertible(Cluster cluster) {//TODO mo¿na rozkminiæ SVD i doac wartosc tylko do tego elementu na diagonalu, gdzie nalezy
 		Matrix covariance = cluster.getCovariance();
 		double sumOfAddedValues = 0.0d;
 		int increaseCounter = 0;

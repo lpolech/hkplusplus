@@ -145,6 +145,8 @@ public class CmdLineParser {
 		
 		options.addOption("km", "use-kmeans", false, "use kmeans clustering algorithm");
 		options.addOption("gmm", "use-gaussian-mixture-model", false, "use gaussian-mixture-model clustering with expectation-maximisation");
+		options.addOption("lgmm", "use-log-gaussian-mixture-model", false, "use gaussian-mixture-model clustering with expectation-maximisation that utilise logarithms"
+				+ " intead of direct probability representation. That change should increase the performance of method because of number underflows.");
 		options.addOption("v", "verbose", false, "verbose program execution");
 		options.addOption("c", "class-attribute", false, "indicates that FIRST column of data is class attribute, class shoud be indicated "
 				+ "by string. When class attribute is provided "
@@ -271,6 +273,11 @@ public class CmdLineParser {
 		{
 			return AlgEnum.GMM;
 		}
+		else if(cmd.hasOption("lgmm"))
+		{
+			return AlgEnum.LOG_GMM;
+		}
+		
 		System.err.println("No clusterisation method was set!");
 		System.exit(1);
 		return null;

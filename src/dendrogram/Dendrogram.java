@@ -37,6 +37,7 @@ import data.DataStatistics;
 import data.Parameters;
 import distance.measures.GMMBayesMLE;
 import distance.measures.L2Norm;
+import distance.measures.LOG_GMMBayesMLE;
 import external_measures.AdaptedFmeasure;
 import external_measures.PartialOrderFmeasure;
 import external_measures.StandardFmeasure;
@@ -166,6 +167,13 @@ public class Dendrogram {
 			DendrogramLevel.setDistanceMethod(new EM());
 			DendrogramLevel.setMeasure(new GMMBayesMLE());
 			break;
+		case LOG_GMM:
+			EM.setMeasure(new LOG_GMMBayesMLE());
+			clusterisationAlgorithm = new EM();
+			Cluster.setAlgorithm(clusterisationAlgorithm);
+			DendrogramLevel.setDistanceMethod(new EM());
+			DendrogramLevel.setMeasure(new LOG_GMMBayesMLE());
+			break;
 		}
 	}
 
@@ -194,6 +202,7 @@ public class Dendrogram {
 		}
 		
 		Utils.stopTimer();
+		System.out.println("Method time: " + Utils.getTimerReport());
 		
 		System.out.print("Computing final statistics... ");
 		Hierarchy h = computeFinalResultStatistics(getDendrogramBottom());

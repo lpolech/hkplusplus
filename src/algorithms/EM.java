@@ -11,6 +11,8 @@ import data.Data;
 import data.DataPoint;
 import data.MixtureNumberWithItsResponsibility;
 import data.Parameters;
+import distance.measures.GMMBayesMLE;
+import distance.measures.LOG_GMMBayesMLE;
 import distance.measures.Measure;
 
 public class EM extends Common implements CenterMethod {
@@ -156,7 +158,14 @@ public class EM extends Common implements CenterMethod {
 		{
 			for(int j = 0; j < clusterisation.length; j++)
 			{
-				pointsToMixturesPosteriories[i][j] = calculateResponsibilityValue(pointsToMixturesProbabilities, clusterisation, i, j);
+				if(measure.getClass() == GMMBayesMLE.class)
+				{
+					pointsToMixturesPosteriories[i][j] = calculateResponsibilityValue(pointsToMixturesProbabilities, clusterisation, i, j);
+				}
+				else if(measure.getClass() == LOG_GMMBayesMLE.class)
+				{
+					pointsToMixturesPosteriories[i][j] = calculateLOGResponsibilityValue(pointsToMixturesProbabilities, clusterisation, i, j);
+				}
 				if(pointsToMixturesPosteriories[i][j] == 0.0d)
 				{
 					numberOfZeroPosterioriProb++;
@@ -183,7 +192,7 @@ public class EM extends Common implements CenterMethod {
 		return pointsToMixturesProbabilities;
 	}
 	
-	private double[] calculateSumOfAllPointsResponsibility(
+	private double[] calculateSumOfAllPointsResponsibility(// no matter if it is LOG representation or not, the sum is always the sum (without any logs)
 			Cluster parent, Cluster[] clusterisation, double[][] pointsToMixturePosteriories) 
 	{
 		double[] clustersSumOfPosteriories = new double[clusterisation.length];
@@ -191,7 +200,14 @@ public class EM extends Common implements CenterMethod {
 		{
 			for(int j = 0; j < parent.getNumberOfPoints(); j++)
 			{
-				clustersSumOfPosteriories[i] += pointsToMixturePosteriories[j][i];
+				if(measure.getClass() == GMMBayesMLE.class)
+				{
+					clustersSumOfPosteriories[i] += pointsToMixturePosteriories[j][i];
+				}
+				else if(measure.getClass() == LOG_GMMBayesMLE.class)
+				{
+					clustersSumOfPosteriories[i] += Math.exp(pointsToMixturePosteriories[j][i]);
+				}
 			}
 		}
 		return clustersSumOfPosteriories;
@@ -343,16 +359,60 @@ public class EM extends Common implements CenterMethod {
 		return returnValue;
 	}
 	
+	private double calculateLOGResponsibilityValue(
+			double[][] pointsToMixturesProbabilities,
+			Cluster[] clusterisation, int pointNumber, int mixtureNumber) {
+		double firstElementValue = Math.log(clusterisation[mixtureNumber].getMixingCoefficient()) + pointsToMixturesProbabilities[pointNumber][mixtureNumber];
+		
+		double maxOfScaledDistances = (-1)*Double.MAX_VALUE;
+		double scaledDistance;
+		for(int i = 0; i < clusterisation.length; i++)
+		{
+			scaledDistance = clusterisation[i].getMixingCoefficient()*pointsToMixturesProbabilities[pointNumber][i];
+			if(scaledDistance > maxOfScaledDistances)
+			{
+				maxOfScaledDistances = scaledDistance;
+			}
+		}
+		
+		firstElementValue -= maxOfScaledDistances;
+		
+		double secondElementSum = 0;
+		for(int i = 0; i < clusterisation.length; i++)
+		{
+			double sumElement = Math.log(clusterisation[i].getMixingCoefficient()) + pointsToMixturesProbabilities[pointNumber][i] - maxOfScaledDistances;
+			secondElementSum += Math.exp(sumElement);
+		}
+		
+		double secondElementValue = Math.log(secondElementSum);
+		double returnValue = firstElementValue - secondElementValue;
+		
+		if(Parameters.isStaticCenterResponsibilityScalling() 
+				&& clusterisation[mixtureNumber].isStaticCenter())
+		{
+			returnValue *= Parameters.getResponsibilityScallingFactor();
+		}
+		
+		if(Double.isInfinite(returnValue) || Double.isNaN(returnValue))
+		{
+			System.err.println("EM.calculateLOGResponsibilityValue returning value is not finite! "
+					+ "firstElementValue = Math.log(clusterisation[mixtureNumber].getMixingCoefficient()) + pointsToMixturesProbabilities[pointNumber][mixtureNumber] "
+					+ firstElementValue + " = " + Math.log(clusterisation[mixtureNumber].getMixingCoefficient()) + " + " 
+					+ pointsToMixturesProbabilities[pointNumber][mixtureNumber]
+					+ " secondElementValue = " + secondElementValue);
+		}
+		return returnValue;
+	}
+	
 	private Cluster[] maximization(Cluster parent, Cluster[] clusterisation, double[][] pointsToMixturePosteriories, double[] clustersSumOfPosteriories) {
 		//TODO tak naprawde rekalkulacja odbywa sie wzgledem WSZYTSKICH punktow z parenta, a wiec olewane jest przypisanie punktow do centr
-		clusterisation = recalculateMixingCoefficients(parent, clusterisation, pointsToMixturePosteriories, clustersSumOfPosteriories);
+		clusterisation = recalculateMixingCoefficients(parent, clusterisation, clustersSumOfPosteriories);//since clustersSumOfPosteriories are NOT calculated with log, thus we can use this method for both variants without any change
 		clusterisation = recalculateMiues(parent, clusterisation, pointsToMixturePosteriories, clustersSumOfPosteriories);//TODO do wyznaczenia nowych miu korzystan ze zrekalkulowanych prawdopod. priori
 		clusterisation = recalculateCovarianceMatrices(parent, clusterisation, pointsToMixturePosteriories, clustersSumOfPosteriories);//TODO do rekal;kulacji kowariancji korzystam z nowych miu
 		return clusterisation;
 	}
 
-	private Cluster[] recalculateMixingCoefficients(Cluster parent, Cluster[] clusterisation,
-			double[][] pointsToMixturePosteriories, double[] clustersSumOfPosteriories) {
+	private Cluster[] recalculateMixingCoefficients(Cluster parent, Cluster[] clusterisation, double[] clustersSumOfPosteriories) {
 		double newMixingCoefficientValue;
 		for(int i = 0; i < clusterisation.length; i++)//uaktualniane jest rowniez mixing coef. dla staticow, bo inaczej beda one sciagaly wszystkie punkty
 		{
@@ -376,7 +436,17 @@ public class EM extends Common implements CenterMethod {
 					newMiuCoordinateValue = 0.0d;
 					for(int k = 0; k < parent.getNumberOfPoints(); k++)
 					{
-						newMiuCoordinateValue += pointsToMixturePosteriories[k][i]*parent.getPoints()[k].getCoordinate(j);
+						double pointPosteriori = (-1)*Double.MAX_VALUE;
+						if(measure.getClass() == GMMBayesMLE.class)
+						{
+							pointPosteriori = pointsToMixturePosteriories[k][i];
+						}
+						else if(measure.getClass() == LOG_GMMBayesMLE.class)
+						{
+							pointPosteriori = Math.exp(pointsToMixturePosteriories[k][i]);
+						}
+						
+						newMiuCoordinateValue += pointPosteriori*parent.getPoints()[k].getCoordinate(j);
 					}
 					newMiuCoordinateValue /= clustersSumOfPosteriories[i];
 					newMiu.setCoordinate(j, newMiuCoordinateValue);
@@ -401,7 +471,16 @@ public class EM extends Common implements CenterMethod {
 				{
 					Matrix pointToMeanDifference = parent.getPoints()[j].getMatrix().minus(clusterisation[i].getCenter().getMatrix());
 					pointToMeanDifference = pointToMeanDifference.times(pointToMeanDifference.transpose());
-					pointToMeanDifference = pointToMeanDifference.times(pointsToMixturePosteriories[j][i]);
+					
+					if(measure.getClass() == GMMBayesMLE.class)
+					{
+						pointToMeanDifference = pointToMeanDifference.times(pointsToMixturePosteriories[j][i]);
+					}
+					else if(measure.getClass() == LOG_GMMBayesMLE.class)
+					{
+						pointToMeanDifference = pointToMeanDifference.times(Math.exp(pointsToMixturePosteriories[j][i]));
+					}
+					
 					sum = sum.plus(pointToMeanDifference);
 					if(Double.isInfinite(sum.get(0, 0)) || Double.isInfinite(sum.get(0, 1)) || Double.isInfinite(sum.get(1, 0)) || Double.isInfinite(sum.get(1, 1))
 					   || Double.isNaN(sum.get(0, 0)) || Double.isNaN(sum.get(0, 1)) || Double.isNaN(sum.get(1, 0)) || Double.isNaN(sum.get(1, 1)))
