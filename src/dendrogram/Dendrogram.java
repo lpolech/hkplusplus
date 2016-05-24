@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -214,7 +215,9 @@ public class Dendrogram {
 	
 	private void saveFinalHierarchyOfGroups(String finalHierarchyOfGroupsFilename,
 			DendrogramLevel dendrogramBottom, Hierarchy h) {
-		Path finalHierarchyOfGroupsFile = Utils.createCsvFileIfNotExists(finalHierarchyOfGroupsFilename);
+		//new File(levelsResultsStorage.toString() + File.separator + levelNumber + "_clusterisation" + ".csv");
+		//Path finalHierarchyOfGroupsFile = Utils.createCsvFileIfNotExists(finalHierarchyOfGroupsFilename);
+		File finalHierarchyOfGroupsFile = new File(levelsResultsStorage.toString() + File.separator + finalHierarchyOfGroupsFilename + ".csv");
 		
 		try (FileWriter result = new FileWriter(finalHierarchyOfGroupsFile.toString(), false)) 
 		{
@@ -223,14 +226,14 @@ public class Dendrogram {
 				h = this.getHierarchyRepresentation();
 			}
 			
-			LinkedList<Instance> instances = h.getRoot().getSubtreeInstances();
+			LinkedList<Instance> instances = (LinkedList<Instance>) h.getRoot().getSubtreeInstances().clone();
 			for(DataPoint dp: this.points.getPoints())
 			{
 				boolean found = false;
 				for(int i = 0; i < instances.size() && !found; i++)
 				{
 					Instance inst = instances.get(i);
-					if(inst.getData() == dp.getSourceCoordinates())//the references should be the same, because no copy is done during program execution
+					if(Arrays.equals(inst.getData(), dp.getSourceCoordinates()))
 					{
 						found = true;
 						String trueClass = (inst.getTrueClass().equals("void")? "" : Constans.delimiter + inst.getTrueClass());
@@ -245,6 +248,7 @@ public class Dendrogram {
 						resultFileLine += "\n";
 						
 						result.write(resultFileLine);
+						instances.remove(i);
 					}
 				}
 			}

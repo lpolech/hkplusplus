@@ -368,7 +368,7 @@ public class EM extends Common implements CenterMethod {
 		double scaledDistance;
 		for(int i = 0; i < clusterisation.length; i++)
 		{
-			scaledDistance = clusterisation[i].getMixingCoefficient()*pointsToMixturesProbabilities[pointNumber][i];
+			scaledDistance = Math.log(clusterisation[i].getMixingCoefficient()) + pointsToMixturesProbabilities[pointNumber][i];
 			if(scaledDistance > maxOfScaledDistances)
 			{
 				maxOfScaledDistances = scaledDistance;
@@ -418,6 +418,12 @@ public class EM extends Common implements CenterMethod {
 		{
 			newMixingCoefficientValue = clustersSumOfPosteriories[i]/(double)parent.getNumberOfPoints();
 			clusterisation[i].setMixingCoefficient(newMixingCoefficientValue);
+			
+			if(Double.isInfinite(newMixingCoefficientValue) || Double.isNaN(newMixingCoefficientValue))
+			{
+				System.err.println("EM.recalculateMixingCoefficients, newMixingCoefficientValue is not finite! newMixingCoefficientValue = " + newMixingCoefficientValue
+						+ " clustersSumOfPosteriories[i] = " + clustersSumOfPosteriories[i] + " parent.getNumberOfPoints() = " + parent.getNumberOfPoints());
+			}
 		}
 		return clusterisation;
 	}
@@ -487,6 +493,12 @@ public class EM extends Common implements CenterMethod {
 					{
 						System.out.println("EM.recalculateCovarianceMatrices() sum matrix have not finite value! Sum matrix values:");
 						System.out.println(sum.get(0, 0) + " " + sum.get(0, 1) + "\n" + sum.get(1, 0) + " " + sum.get(1, 1));
+						System.out.println("calculationConstant = " + calculationConstant);
+						System.out.println("pointToMeanDifference:");
+						System.out.println(pointToMeanDifference.get(0, 0) + " " + pointToMeanDifference.get(0, 1) + "\n" + pointToMeanDifference.get(1, 0) + " " 
+								+ pointToMeanDifference.get(1, 1));
+						System.out.println("parent.getPoints()[j].getMatrix():");
+						System.out.println(parent.getPoints()[j].getMatrix().get(0, 0) + " " + parent.getPoints()[j].getMatrix().get(1, 0));
 					}
 				}
 				newCovariance = sum.times(calculationConstant);

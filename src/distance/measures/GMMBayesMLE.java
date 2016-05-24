@@ -68,7 +68,7 @@ public class GMMBayesMLE implements Measure {
 		expFunctionExponent = null;
 		double secondFactor = Math.exp(expFunctionExponentValue);
 		double returnValue = (firstFactor*secondFactor);
-		if(Parameters.isVerbose() && Double.isInfinite(returnValue) || Double.isNaN(returnValue))
+		if(Double.isInfinite(returnValue) || Double.isNaN(returnValue))
 		{
 			System.out.println("GMMBayesMLE.distance calculated distance is not finite! Return value: " + returnValue
 					+ " first factor: " + firstFactor + " second: " + secondFactor);
