@@ -14,13 +14,14 @@ public class Main {
 		//L = {5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5}
 		//E = {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5}
 		args = new String[]{
-				"-i", "E:/VirtualBox_Shared/mat_ORG_rozmiary_Edge_tool_n03265032/Edge_tool.sbow.csv",//"Edge_tool.sbowSIMPLE_BINARY_SEARCH/375.csv",//"easy3Simply.txt",
+//				"-i", "E:/VirtualBox_Shared/mat_ORG_rozmiary_Edge_tool_n03265032/Edge_tool.sbow.csv",//"Edge_tool.sbowSIMPLE_BINARY_SEARCH/375.csv",//"easy3Simply.txt",
+				"-i", "features-of-105-songs.csv",
 //				"-h",
 //				"-gmm",
 				"-lgmm",
 				"-s", "4",
 				"-v",
-				"-o", "edgeSIMPLE",//.concat(String.valueOf(L)).concat("_E").concat(String.valueOf(E)),
+				"-o", "105-songs",//.concat(String.valueOf(L)).concat("_E").concat(String.valueOf(E)),
 				"-k", "2",
 				"-n", "1",//40//60 back
 				"-r", "1",//10 //60 back
@@ -44,8 +45,8 @@ public class Main {
 		CmdLineParser parser = new CmdLineParser();
 		parser.parse(args);
 		
-		Data inputData = DataReader.read(Parameters.getInputDataFilePath(), Parameters.getDimensionsNamesFilePath());
-		Dendrogram dendrogram = new Dendrogram(inputData, Parameters.getMethod(), Parameters.getK(), 
+		Data inputData = DataReader.read(Parameters.getInputDataFilePath());
+		Dendrogram dendrogram = new Dendrogram(inputData, Parameters.getMethod(), Parameters.getK(),
 				Parameters.getDendrogramMaxHeight(), Parameters.getOutputFolder());
 		dendrogram.run();
 		

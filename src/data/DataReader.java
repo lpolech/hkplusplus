@@ -9,11 +9,11 @@ import utils.Constans;
 
 public class DataReader {
 	
-	public static Data read(Path inputFilePath, Path dimensionsNamesFilePath)
+	public static Data read(Path inputFilePath)
 	{		
 		NumberOfPointsAndDataDimension pointsAndDimension = getNumberOfPointsAndItsDimension(inputFilePath);
 		DataPoint[] points = readAndParseDataPoints(inputFilePath, pointsAndDimension);
-		HashMap<Integer, String> dimensionNumberAndItsName = readAndParseDimensionsNames(dimensionsNamesFilePath);
+		HashMap<Integer, String> dimensionNumberAndItsName = readAndParseDimensionsNames(inputFilePath, pointsAndDimension);
 		
 		HashMap<String, Integer> classNameAndItsId = getClassNameAndItsId(points);
 		DataStatistics dataStats = calculateDataStatistics(points, pointsAndDimension.getDataDimension(), classNameAndItsId);
@@ -53,7 +53,7 @@ public class DataReader {
 		NumberOfPointsAndDataDimension pointsAndDimension = new NumberOfPointsAndDataDimension(-1, -1);
 		try(Scanner scanner = new Scanner(inputFilePath))
 		{
-			if(scanner.hasNextLine())
+			if(scanner.hasNextLine() && !scanner.nextLine().equals("")) //skip column names
 			{
 				String firstLine = scanner.nextLine();
 				int numberOfPoints = 1;
@@ -71,8 +71,8 @@ public class DataReader {
 			}
 			else
 			{
-				System.err.println("Cannot predict number of data dimensions based on the first line of input file OR"
-						+ " cannot count the number of points in datafile.");
+				System.err.println("Cannot predict number of data dimensions based on the second line of input file OR"
+						+ " cannot count the number of points in datafile. First line are names for columns.");
 				System.exit(1);
 			}
 		} catch (IOException e) {
@@ -90,6 +90,7 @@ public class DataReader {
 		
 		try(Scanner scanner = new Scanner(inputFilePath))
 		{
+            scanner.nextLine();//skip column names
 			while(scanner.hasNextLine())
 			{
 				String rawDataPoint = scanner.nextLine();
@@ -126,14 +127,7 @@ public class DataReader {
 		
 		if(Parameters.isInstanceName())
 		{
-			if(Parameters.isClassAttribute())
-			{
-				instanceName = dataPointValues[1];
-			}
-			else
-			{
-				instanceName = dataPointValues[0];
-			}
+            instanceName = dataPointValues[Parameters.isClassAttribute()? 1 : 0];
 		}
 		
 		for(int i = 0; i < numberOfDimension; i++)
@@ -152,26 +146,30 @@ public class DataReader {
 	}
 
 	private static HashMap<Integer, String> readAndParseDimensionsNames(
-			Path dimensionsNamesFilePath) {
+			Path inputFilePath, NumberOfPointsAndDataDimension pointsAndDimension) {
 		HashMap<Integer, String> dimensionNumberAndItsName = new HashMap<Integer, String>();
-		if(dimensionsNamesFilePath != null)
+		if(inputFilePath != null)
 		{
-			try(Scanner scanner = new Scanner(dimensionsNamesFilePath))
+			try(Scanner scanner = new Scanner(inputFilePath))
 			{
-				while(scanner.hasNextLine())
+				if(scanner.hasNextLine())
 				{
 					String rawLine = scanner.nextLine();
 					String[] splittedLine = rawLine.split(Constans.delimiter);
-					if(splittedLine.length != 2)
+					if(splittedLine.length != pointsAndDimension.getDataDimension() + (Parameters.isClassAttribute()? 1: 0)
+                            + (Parameters.isInstanceName()? 1 : 0))
 					{
-						System.err.println("Read line " + rawLine + "from " + dimensionNumberAndItsName
-								+ " don't have proper format! There should be <dimensionNumber>" 
-								+ Constans.delimiter + "<name>" );
+						System.err.println("Read the first line " + rawLine + "from " + inputFilePath
+								+ " and it doesn't have proper format! The first line should contain the data attribute"
+                                + " names. It should be delimited by: " + Constans.delimiter);
 						System.exit(1);
 					}
 					else
 					{
-						parseDimensionAndItsName(dimensionNumberAndItsName, splittedLine);
+						for(int i = 0; i < splittedLine.length; i++)
+                        {
+                            dimensionNumberAndItsName.put(i, splittedLine[i]);
+                        }
 					}
 				}
 			}
@@ -180,15 +178,6 @@ public class DataReader {
 			}
 		}
 		return dimensionNumberAndItsName;
-	}
-	
-	private static void parseDimensionAndItsName(
-			HashMap<Integer, String> dimensionNumberAndItsName,
-			String[] splittedLine) 
-	{
-		Integer dim = Integer.valueOf(splittedLine[0]);
-		String name = splittedLine[1];
-		dimensionNumberAndItsName.put(dim, name);
 	}
 	
 	private static DataStatistics calculateDataStatistics(
