@@ -33,7 +33,6 @@ public class Main {
 				"-gi", //"666",
 				"-w", "2147483600",
 				"-in",
-//				"-nn",
 //				"-ds",
 //				"-scac",
 //				"-sccs",

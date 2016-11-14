@@ -52,7 +52,7 @@ public class Utils {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			System.out.println("Creating csv file: " + csvFile.toString());
+			System.out.println("Created csv file: " + csvFile.toString());
 		}
 		return csvFile;
 	}

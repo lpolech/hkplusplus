@@ -18,8 +18,6 @@ import java.util.Stack;
 
 import javax.imageio.ImageIO;
 
-import utils.Constans;
-import utils.Utils;
 import algorithms.AlgEnum;
 import algorithms.Algorithm;
 import algorithms.EM;
@@ -40,8 +38,11 @@ import distance.measures.GMMBayesMLE;
 import distance.measures.L2Norm;
 import distance.measures.LOG_GMMBayesMLE;
 import external_measures.AdaptedFmeasure;
-import external_measures.PartialOrderFmeasure;
-import external_measures.StandardFmeasure;
+import external_measures.statistical_hypothesis.FlatHypotheses;
+import external_measures.statistical_hypothesis.PartialOrderHypotheses;
+import external_measures.statistical_hypothesis.Fmeasure;
+import utils.Constans;
+import utils.Utils;
 
 public class Dendrogram {
 	private Data points;
@@ -54,8 +55,8 @@ public class Dendrogram {
 	private int currentNumberOfNodes;
 	private AdaptedFmeasure adaptedFmeasureWithInheritance;
 	private AdaptedFmeasure adaptedFmeasureWithOUTInheritance;
-	private StandardFmeasure standardFmeasure;
-	private PartialOrderFmeasure partialOrderFscore;
+	private Fmeasure standardFmeasure;
+	private Fmeasure partialOrderFscore;
 	
 	public Dendrogram(Data points, AlgEnum clusterisationMethod, int k, int levelsLimit, 
 			Path levelsImgsStorage)
@@ -66,8 +67,8 @@ public class Dendrogram {
 		this.levelsResultsStorage = levelsImgsStorage;
 		this.adaptedFmeasureWithInheritance = new AdaptedFmeasure(true);//boolean instancesInheritance, boolean imitateFlatClustering
 		this.adaptedFmeasureWithOUTInheritance = new AdaptedFmeasure(false);//boolean instancesInheritance, boolean imitateFlatClustering
-		this.standardFmeasure = new StandardFmeasure();
-		this.partialOrderFscore = new PartialOrderFmeasure();
+		this.standardFmeasure = new Fmeasure(1.0f, new FlatHypotheses());
+		this.partialOrderFscore = new Fmeasure(1.0f, new PartialOrderHypotheses());
 		
 		dendrogram = new ArrayList<DendrogramLevel>();
 		setClusterisationAlgorithm(clusterisationMethod);
@@ -179,12 +180,14 @@ public class Dendrogram {
 	}
 
 	private void insertRoot() {
-		DendrogramLevel root = new DendrogramLevel(0, points.getDataStats());
+        System.out.println("Inserting root...");
+        DendrogramLevel root = new DendrogramLevel(0, points.getDataStats());
 		root.makeRoot(points);
 		dendrogram.add(root);
 		computeDendrogramStatistics(root);
 		saveClusterisationResults(root, 0, points.getDataStats());
-	}
+        System.out.println("Root inserted");
+    }
 
 	public ArrayList<DendrogramLevel> run()
 	{
@@ -478,7 +481,7 @@ public class Dendrogram {
 							numberOfInstances++;
 						}
 					}
-					BasicNode newNode = new BasicNode(nodeId, null, new LinkedList<Node>(), instances); 
+					BasicNode newNode = new BasicNode(nodeId, null, new LinkedList<Node>(), instances, false);
 					
 					LinkedList<BasicNode> keyesToRemoveFromMap = new LinkedList<BasicNode>();
 					for(Entry<BasicNode, Integer> potentialChild: nodeWhichIsLookingForParentId.entrySet())
