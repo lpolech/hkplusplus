@@ -1,0 +1,3 @@
+[submodule "submodules/hierarchy_measures"]
+	path = submodules/hierarchy_measures
+	url = https://github.com/toSterr/hierarchy_measures.git
