@@ -220,7 +220,7 @@ public class Dendrogram {
 			DendrogramLevel dendrogramBottom, Hierarchy h) {
 		//new File(levelsResultsStorage.toString() + File.separator + levelNumber + "_clusterisation" + ".csv");
 		//Path finalHierarchyOfGroupsFile = Utils.createCsvFileIfNotExists(finalHierarchyOfGroupsFilename);
-		File finalHierarchyOfGroupsFile = new File(levelsResultsStorage.toString() + File.separator + finalHierarchyOfGroupsFilename + ".csv");
+		File finalHierarchyOfGroupsFile = new File(levelsResultsStorage.toString() + File.separator + finalHierarchyOfGroupsFilename);
 		
 		try (FileWriter result = new FileWriter(finalHierarchyOfGroupsFile.toString(), false)) 
 		{
