@@ -4,31 +4,18 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import data.NumberOfPointsAndDataDimension;
+
 public class TestNumberOfPointsAndDataDimension {
 
 	@Test
-	public void testNumberOfPointsAndDataDimension() {
-		fail("Not yet implemented");
-	}
+	public void testNumberOfPointsAndDataDimension()
+	{
+		int nr_of_ponts=1000;
+		int dim =100;
+		NumberOfPointsAndDataDimension test= new NumberOfPointsAndDataDimension(nr_of_ponts, dim);
+		assertEquals(nr_of_ponts, test.getNumberOfPoints());
+		assertEquals(dim,test.getDataDimension());
 
-	@Test
-	public void testGetNumberOfPoints() {
-		fail("Not yet implemented");
 	}
-
-	@Test
-	public void testSetNumberOfPoints() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetDataDimension() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetDataDimension() {
-		fail("Not yet implemented");
-	}
-
 }
