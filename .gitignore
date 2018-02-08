@@ -2,3 +2,7 @@
 out/
 src/META-INF/
 /bin/
+.png
+.csv
+summaryResults.csv
+compactSummaryResults.csv

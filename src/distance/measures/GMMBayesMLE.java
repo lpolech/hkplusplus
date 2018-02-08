@@ -7,6 +7,7 @@ import Jama.Matrix;
 import data.Cluster;
 import data.DataPoint;
 import data.Parameters;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class GMMBayesMLE implements Measure {
 	private static final double revOfSqrtOfPoweredDoublePi = (double)(1.0d/Math.sqrt(Math.pow(Math.PI*2, (double)DataPoint.getNumberOfDimensions())));// TODO moze tyu nie potrzeba tego dzielenia przez dwa (2.0d)? (double)(1.0d/Math.sqrt(Math.pow(Math.PI*2, (double)DataPoint.getNumberOfDimensions()/2.0d)));
@@ -107,8 +108,8 @@ public class GMMBayesMLE implements Measure {
 
 	@Override
 	public double[] updateCenter(DataPoint[] points) {
-		// Not needed
-		return null;
+		throw new NotImplementedException();
+		//return null;
 	}
 
 	@Override

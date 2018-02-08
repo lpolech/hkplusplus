@@ -22,7 +22,7 @@ public class Main {
 				"-lgmm",
 				"-s", "4",
 				"-v",
-				"-o", "105-songs",//.concat(String.valueOf(L)).concat("_E").concat(String.valueOf(E)),
+				"-o", "out",//.concat(String.valueOf(L)).concat("_E").concat(String.valueOf(E)),
 				"-k", "2",
 				"-n", "1",//40//60 back
 				"-r", "1",//10 //60 back

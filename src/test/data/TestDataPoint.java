@@ -29,30 +29,29 @@ public class TestDataPoint {
 
 	@Test
 	public void testSetCoordinates() {
-		//fail("Not yet implemented");
+		fail("Not yet implemented");
 		
 	}
 
 	@Test
 	public void testGetSourceCoordinates() {
-		assertEquals(1, datapoint.getSourceCoordinates()[0], Parameters.getEpsilon());
 		assertArrayEquals(sourceCoordinates, datapoint.getSourceCoordinates(),Parameters.getEpsilon());
 	}
 
 	@Test
-	public void testGetSourceCoordinate1() {
+	public void testGetSourceCoordinate() {
 		assertEquals(sourceCoordinates[0], datapoint.getSourceCoordinate(0),Parameters.getEpsilon());
 		assertEquals(sourceCoordinates[1], datapoint.getSourceCoordinate(1),Parameters.getEpsilon());
 	}
 
 	@Test (expected = java.lang.NullPointerException.class) 
-	public void testGetSourceCoordinate2() {
+	public void testGetSourceCoordinateThrowExceptionWhenNull() {
 		assertEquals(null, datapoint2.getSourceCoordinate(0));
 	}
 	
 	@Test
 	public void testSetSourceCoordinates() {
-		//fail("Not yet implemented");
+		fail("Not yet implemented");
 	}
 
 	@Test
@@ -114,7 +113,7 @@ public class TestDataPoint {
 
 	@Test
 	public void testSetClassAttribute() {
-		//fail("Not yet implemented");
+		fail("Not yet implemented");
 	}
 
 	@Test
@@ -124,7 +123,7 @@ public class TestDataPoint {
 
 	@Test
 	public void testSetInstanceName() {
-		//fail("Not yet implemented");
+		fail("Not yet implemented");
 	}
 
 }

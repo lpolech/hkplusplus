@@ -20,19 +20,22 @@ public class TestData {
 	DataPoint datapoint2= new DataPoint(new double[] {1,1},new double[] {2,2},"instnam","classAt");
 	DataPoint [] datapoints= {datapoint,datapoint2};
 	
-	
 	static DataStatistics stats; 
-	
 	static Data data;
+	
+	public TestData()
+	{
+		Parameters.setVerbose(false);
+		Parameters.setClassAttribute(false);
+		
+		//zamokowac metode, i ustawic spowrotem prywatna
+		stats = DataReader.calculateDataStatistics
+				(datapoints, new NumberOfPointsAndDataDimension(2,2).getDataDimension(), new HashMap<String, Integer>());
+		data = new Data(datapoints,2,2, stats, null);
+	}
 	
 	@Test
 	public void testData() {
-		Parameters.setVerbose(false);
-		Parameters.setClassAttribute(false);
-		stats = DataReader.calculateDataStatistics
-				(datapoints, new NumberOfPointsAndDataDimension(2,2).getDataDimension(), new HashMap<String, Integer>());
-		
-		data = new Data(datapoints,2,2, stats, null);
 		//fail("Not yet implemented");
 	}
 

@@ -11,8 +11,10 @@ import data.Cluster;
 import data.Data;
 import data.DataReader;
 import data.Parameters;
+import distance.measures.GMMBayesMLE;
 import distance.measures.L2Norm;
 import distance.measures.LOG_GMMBayesMLE;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class TestCentroid {
 
@@ -37,6 +39,16 @@ public class TestCentroid {
 		inputData = DataReader.read(Paths.get("test3.csv"));
 		Cluster cluster = centroid.makeCluster(inputData, new L2Norm());
 		Cluster cluster2= centroid.updateCenter(cluster, new  L2Norm());
+		assertEquals(cluster2, cluster);
+	}
+	
+	@Test(expected = NotImplementedException.class) 
+	public void testUpdateCenterThrowsException()  {
+		Parameters.setVerbose(true);
+		Parameters.setClassAttribute(true);
+		inputData = DataReader.read(Paths.get("test3.csv"));
+		Cluster cluster = centroid.makeCluster(inputData, new GMMBayesMLE());
+		Cluster cluster2= centroid.updateCenter(cluster, new  GMMBayesMLE());
 		assertEquals(cluster2, cluster);
 	}
 
