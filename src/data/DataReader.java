@@ -53,7 +53,7 @@ public class DataReader {
 		NumberOfPointsAndDataDimension pointsAndDimension = new NumberOfPointsAndDataDimension(-1, -1);
 		try(Scanner scanner = new Scanner(inputFilePath))
 		{
-			if(scanner.hasNextLine() && !scanner.nextLine().equals("")) //skip column names
+			if(scanner.hasNextLine() /*&& !scanner.nextLine().equals("")*/) //skip column names
 			{
 				String firstLine = scanner.nextLine();
 				int numberOfPoints = 1;
@@ -90,7 +90,8 @@ public class DataReader {
 		
 		try(Scanner scanner = new Scanner(inputFilePath))
 		{
-            scanner.nextLine();//skip column names
+			
+            //scanner.nextLine();//skip column names
 			while(scanner.hasNextLine())
 			{
 				String rawDataPoint = scanner.nextLine();
@@ -108,6 +109,7 @@ public class DataReader {
 					readPointsCounter++;
 				}
 			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -180,7 +182,7 @@ public class DataReader {
 		return dimensionNumberAndItsName;
 	}
 	
-	private static DataStatistics calculateDataStatistics(
+	public static DataStatistics calculateDataStatistics(
 			DataPoint[] points, int numberOfDimensions, HashMap<String, Integer> classNameAndItsId) {
 		double[] minValues = new double[numberOfDimensions];
 		double[] maxValues = new double[numberOfDimensions];

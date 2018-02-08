@@ -59,6 +59,7 @@ public class TestDendrogram {
 		System.out.println("\nDendrogram hierarchy rep: " + dendrogram.getHierarchyRepresentation() + "\n");
 
 		System.out.println("\nDendrogram get den: " + dendrogram.getDendrogram().get(0) + "\n");
+		//fail("Not yet implemented");
 	}
 
 
@@ -67,6 +68,15 @@ public class TestDendrogram {
 		fail("Not yet implemented");
 	}
 
+	@Test
+	public void testGetHierarchyRepresentation() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testGetFinalStatistic() {
+		fail("Not yet implemented");
+	}
 
 	@Test
 	public void testGetPoints() {

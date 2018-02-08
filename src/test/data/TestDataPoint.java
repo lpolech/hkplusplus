@@ -4,91 +4,127 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import data.DataPoint;
+import data.Parameters;
+
 public class TestDataPoint {
 
+	double [] coordinates= {1,2};
+	double [] sourceCoordinates= {1,2};
+	DataPoint datapoint= new DataPoint(coordinates,sourceCoordinates,"instnam","classAt");
+	DataPoint datapoint2= new DataPoint(coordinates,null,"instnam","classAt");
+	
 	@Test
 	public void testDataPoint() {
-		fail("Not yet implemented");
+		assertNotEquals(sourceCoordinates , datapoint.getSourceCoordinates());
+		assertEquals(null , datapoint2.getSourceCoordinates());
 	}
 
 	@Test
 	public void testGetCoordinate() {
-		fail("Not yet implemented");
+		assertEquals(1, datapoint.getCoordinate(0), Parameters.getEpsilon());
+		assertEquals(2, datapoint.getCoordinate(1), Parameters.getEpsilon());
+		
 	}
 
 	@Test
 	public void testSetCoordinates() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
+		
 	}
 
 	@Test
 	public void testGetSourceCoordinates() {
-		fail("Not yet implemented");
+		assertEquals(1, datapoint.getSourceCoordinates()[0], Parameters.getEpsilon());
+		assertArrayEquals(sourceCoordinates, datapoint.getSourceCoordinates(),Parameters.getEpsilon());
 	}
 
 	@Test
-	public void testGetSourceCoordinate() {
-		fail("Not yet implemented");
+	public void testGetSourceCoordinate1() {
+		assertEquals(sourceCoordinates[0], datapoint.getSourceCoordinate(0),Parameters.getEpsilon());
+		assertEquals(sourceCoordinates[1], datapoint.getSourceCoordinate(1),Parameters.getEpsilon());
 	}
 
+	@Test (expected = java.lang.NullPointerException.class) 
+	public void testGetSourceCoordinate2() {
+		assertEquals(null, datapoint2.getSourceCoordinate(0));
+	}
+	
 	@Test
 	public void testSetSourceCoordinates() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 	@Test
 	public void testSetCoordinate() {
-		fail("Not yet implemented");
+		datapoint.setCoordinate(0, 2);
+		assertEquals(2, datapoint.getCoordinate(0), Parameters.getEpsilon());
 	}
 
 	@Test
 	public void testGetCoordinates() {
-		fail("Not yet implemented");
+		assertEquals(1, datapoint.getCoordinates()[0], Parameters.getEpsilon());
+		assertArrayEquals(coordinates, datapoint.getCoordinates(),Parameters.getEpsilon());
 	}
 
+	//moze powinismy inicjowac w konstuktorze ta wartosc? 
+	//choc z drugiej strony wywolywanie iteratorow dla kazdego punktu w duzych zbiorach jest bez sensu
 	@Test
 	public void testGetNumberOfDimensions() {
-		fail("Not yet implemented");
+		assertEquals(2, datapoint.getNumberOfDimensions());
 	}
 
 	@Test
 	public void testSetNumberOfDimensions() {
-		fail("Not yet implemented");
+		datapoint.setNumberOfDimensions(2);
+		assertEquals(2, datapoint.getNumberOfDimensions());
 	}
 
 	@Test
 	public void testGetMatrix() {
-		fail("Not yet implemented");
+		assertEquals(datapoint.getNumberOfDimensions(), datapoint.getMatrix().getRowDimension());
+		assertEquals(1, datapoint.getMatrix().getColumnDimension());
+		
+		
 	}
 
 	@Test
 	public void testToString() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
+		//wystarczy ze cokolwiek da
+		datapoint.setNumberOfDimensions(2);
+		System.out.println(datapoint);
+		Parameters.setClassAttribute(true);
+		Parameters.setInstanceName(true);
+		System.out.println(datapoint);
 	}
 
 	@Test
 	public void testArePointsPointingTheSame() {
-		fail("Not yet implemented");
+		assertEquals(true, datapoint.arePointsPointingTheSame(datapoint2));
+		assertEquals(true, datapoint.arePointsPointingTheSame(datapoint));
+		datapoint2.setCoordinate(0, 2);
+		assertEquals(false, datapoint.arePointsPointingTheSame(datapoint2));
 	}
 
 	@Test
 	public void testGetClassAttribute() {
-		fail("Not yet implemented");
+		assertEquals("classAt", datapoint.getClassAttribute());
 	}
 
 	@Test
 	public void testSetClassAttribute() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 	@Test
 	public void testGetInstanceName() {
-		fail("Not yet implemented");
+		assertEquals("instnam", datapoint.getInstanceName());
 	}
 
 	@Test
 	public void testSetInstanceName() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 
 }

@@ -1,0 +1,59 @@
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9166464130279;0.5475510750324692;0.54755107503247
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;test;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9166464130279;0.5475510750324692;0.54755107503247
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;2;1;1;4;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;105-songs;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9166464130279;0.5475510750324692;0.54755107503247
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9166464130279;0.5475510750324692;0.54755107503247
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9166464130279;0.5475510750324692;0.54755107503247
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9166464130279;0.5475510750324692;0.54755107503247
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;2;1;1;4;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;105-songs;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9166464130279;0.5475510750324692;0.54755107503247
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test2.csv;2;1;1;4;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;105-songs;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;-46427.882123322976;0.7888416261674999;0.7888416261674999
+1;-46427.28285654541;0.5164698518250344;0.7889124183816721
+2;-37854.146876806204;0.5134770351712238;0.7889151083577075
+3;4330.999023761702;0.232036327979565;0.7890327016288694
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9737769230708;0.5475619987465571;0.5475619987465568
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9737769230708;0.5475619987465571;0.5475619987465568
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9737769230708;0.5475619987465571;0.5475619987465568
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9737769230708;0.5475619987465571;0.5475619987465568
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9737769230708;0.5475619987465571;0.5475619987465568
+Dataset;Num. of Clusters;Num. of Alg. Iterations (n);Num. of Alg. Repeats (r);Max Dendrogram Size (s);Epsilon;Little Value;Resp. Scal. Fact. (rf);Covar. Scal. Fact. (cf);Clusterisation Method;Output;Dimension File;Verbose;Use static center;Adapt. Static Cen. Cov. Matrix;Scalling Static Cen. Cov. Matrix;Scalling Static Cen. Resp. Value;Diagonal matrix;Reestimate clusters
+test.csv;5;1;1;2;1.0E-10;1.0;4.9E-324;4.9E-324;LOG_GMM;out;null;true;true;false;false;false;true;false
+Clust. Level;Data Log. Likelihood;Flat FMeasure;Incremental hierarch. FMeasure
+0;704.9737769230708;0.5475619987465571;0.5475619987465568
