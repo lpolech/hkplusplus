@@ -182,6 +182,7 @@ public class DataReader {
 		return dimensionNumberAndItsName;
 	}
 	
+	//zmieni³êm typ na public, ale mo¿e ta funkcja powina byc jako konstruktor w dataStatistic?
 	public static DataStatistics calculateDataStatistics(
 			DataPoint[] points, int numberOfDimensions, HashMap<String, Integer> classNameAndItsId) {
 		double[] minValues = new double[numberOfDimensions];
