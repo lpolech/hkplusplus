@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import Jama.Matrix;
 import algorithms.Algorithm;
 import algorithms.EM;
 import algorithms.Kmeans;
@@ -76,11 +77,19 @@ public class TestCluster {
 		cluster.setCenter(newCenter);
 		assertEquals(newCenter, cluster.getCenter());
 	}
-
+	
+	@Test (expected = java.lang.NullPointerException.class) 
+	public void testPerformSplitBefforSetAlgorithm() {
+		cluster.performSplit(2, 0);
+		fail("Not yet implemented");
+	}
+	
+	//TODO wrocic do tego gdy zrobimy ut dla EM lub Kmeans
 	@Test
 	public void testPerformSplit() {
+		cluster.setAlgorithm(new EM());
+		//cluster.performSplit(2, 0);
 		fail("Not yet implemented");
-		
 	}
 
 	@Test
@@ -119,7 +128,10 @@ public class TestCluster {
 
 	@Test
 	public void testSetCovariance() {
-		fail("Not yet implemented");
+		Matrix matrix= new Matrix(2, 2);
+		cluster.setCovariance(matrix);
+		assertEquals(matrix, cluster.getCovariance());
+		
 	}
 
 	@Test
@@ -157,6 +169,8 @@ public class TestCluster {
 
 	@Test
 	public void testToString() {
+		Parameters.setClassAttribute(false);
+		Parameters.setInstanceName(false);
 		assertEquals("Center: ;Source:;\nNum. of Pts: 2\nMixing coef.: 0.0\nStatic: false\n"
 				+ "Cov. matrix: null\nColour on img.: java.awt.Color[r=255,g=255,b=255]\n"
 				+ "Parent Id: 0\nCluster Id: 0", cluster.toString());

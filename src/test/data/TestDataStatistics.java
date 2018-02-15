@@ -2,83 +2,113 @@ package test.data;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+
 import org.junit.Test;
+
+import data.Data;
+import data.DataStatistics;
+import data.Parameters;
 
 public class TestDataStatistics {
 
+	double[] minValues;
+	double[] maxValues;
+	DataStatistics dataStatistics;
+	
+	public TestDataStatistics() {
+		minValues=new double [] {1,2};
+		maxValues=new double [] {1,2};
+		dataStatistics= new DataStatistics(minValues,maxValues, new double []{1,1}, 2, new HashMap<String, Integer>(), new int[] {1,1}, 0);
+	}
+	
 	@Test
 	public void testDataStatistics() {
 		fail("Not yet implemented");
+		//nie wiem czy potrzebujuje tego testu, ale wygenerowal sie z automatu
 	}
 
 	@Test
 	public void testGetMinValues() {
-		fail("Not yet implemented");
+		assertArrayEquals(minValues, dataStatistics.getMinValues(),Parameters.getEpsilon());
 	}
 
 	@Test
 	public void testSetMinValues() {
-		fail("Not yet implemented");
+		double[] newMinValues=new double [] {2,3};
+		dataStatistics.setMinValues(newMinValues);
+		assertArrayEquals(newMinValues, dataStatistics.getMinValues(),Parameters.getEpsilon());
 	}
 
 	@Test
 	public void testGetMaxValues() {
-		fail("Not yet implemented");
+		assertArrayEquals(maxValues, dataStatistics.getMaxValues(),Parameters.getEpsilon());
 	}
 
 	@Test
 	public void testSetMaxValues() {
-		fail("Not yet implemented");
+		double[] newMaxValues=new double [] {2,3};
+		dataStatistics.setMaxValues(newMaxValues);
+		assertArrayEquals(newMaxValues, dataStatistics.getMaxValues(),Parameters.getEpsilon());
 	}
 
 	@Test
 	public void testGetEachClassNumberOfInstanceWithInheritance() {
-		fail("Not yet implemented");
+		assertArrayEquals(new int[] {1,1}, dataStatistics.getEachClassNumberOfInstanceWithInheritance());
 	}
 
 	@Test
 	public void testSetEachClassNumberOfInstanceWithInheritance() {
-		fail("Not yet implemented");
+		int [] newEachClassNumberOfInstanceWithInheritance= new int [] {2,2};
+		dataStatistics.setEachClassNumberOfInstanceWithInheritance(newEachClassNumberOfInstanceWithInheritance);
+		assertArrayEquals(newEachClassNumberOfInstanceWithInheritance, dataStatistics.getEachClassNumberOfInstanceWithInheritance());
 	}
 
 	@Test
 	public void testGetClassNameAndItsId() {
-		fail("Not yet implemented");
+		assertEquals(new HashMap<String, Integer>(), dataStatistics.getClassNameAndItsId());
 	}
 
 	@Test
 	public void testSetClassNameAndItsId() {
-		fail("Not yet implemented");
+		HashMap<String, Integer> newClassNameAndItsId=new HashMap<String, Integer>();
+		newClassNameAndItsId.put("klucz", 1);
+		dataStatistics.setClassNameAndItsId(newClassNameAndItsId);
+		assertEquals(newClassNameAndItsId, dataStatistics.getClassNameAndItsId());
 	}
 
 	@Test
 	public void testGetDatasetLength() {
-		fail("Not yet implemented");
+		assertEquals(2, dataStatistics.getDatasetLength());
 	}
 
 	@Test
 	public void testSetDatasetLength() {
-		fail("Not yet implemented");
+		dataStatistics.setDatasetLength(5);
+		assertEquals(5, dataStatistics.getDatasetLength());
 	}
 
 	@Test
 	public void testGetNumberOfNoisePoints() {
-		fail("Not yet implemented");
+		assertEquals(0, dataStatistics.getNumberOfNoisePoints());
 	}
 
 	@Test
 	public void testSetNumberOfNoisePoints() {
-		fail("Not yet implemented");
+		dataStatistics.setNumberOfNoisePoints(5);
+		assertEquals(5, dataStatistics.getNumberOfNoisePoints());
 	}
 
 	@Test
 	public void testGetEachDimNormalisationInterval() {
-		fail("Not yet implemented");
+		assertArrayEquals(new double[] {1,1}, dataStatistics.getEachDimNormalisationInterval(),Parameters.getEpsilon());
 	}
 
 	@Test
 	public void testSetEachDimNormalisationInterval() {
-		fail("Not yet implemented");
+		double [] newEachDimNormalisationInterval= new double [] {2,2};
+		dataStatistics.setEachDimNormalisationInterval(newEachDimNormalisationInterval);
+		assertArrayEquals(newEachDimNormalisationInterval, dataStatistics.getEachDimNormalisationInterval(),Parameters.getEpsilon());
 	}
 
 }

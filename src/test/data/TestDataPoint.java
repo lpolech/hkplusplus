@@ -94,6 +94,8 @@ public class TestDataPoint {
 
 	@Test
 	public void testToString() {
+		Parameters.setClassAttribute(false);
+		Parameters.setInstanceName(false);
 		datapoint.setNumberOfDimensions(2);
 		//System.out.println(datapoint);
 		assertEquals("1.0;2.0;;Source:;1.0;2.0;", datapoint.toString());
