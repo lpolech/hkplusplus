@@ -88,7 +88,7 @@ public class TestCluster {
 	@Test
 	public void testPerformSplit() {
 		cluster.setAlgorithm(new EM());
-		//cluster.performSplit(2, 0);
+		cluster.performSplit(2, 0);
 		fail("Not yet implemented");
 	}
 
@@ -104,7 +104,7 @@ public class TestCluster {
 
 	@Test
 	public void testSetAlgorithm() {
-		//nie ma jak sprawdzic bo nie ma getera?
+		//nie ma jak sprawdzic bo nie ma getera? tylko przy tym jak robi splita?
 		cluster.setAlgorithm(new Kmeans());
 		cluster.setAlgorithm(new EM());
 	}
