@@ -10,8 +10,6 @@ import data.Data;
 import data.DataReader;
 import data.Parameters;
 
-//W data reader wypada³o by inaczej napisac, "read", aby tylko w wybranych przypadkach omijalo pierwszy wiersz. chwilowo obejscie srednie.
-// dodac w params?
 public class TestDataReader {
 
 	@Test

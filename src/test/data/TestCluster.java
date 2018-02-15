@@ -4,76 +4,117 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import algorithms.Algorithm;
+import algorithms.EM;
+import algorithms.Kmeans;
+import data.Cluster;
+import data.ClustersAndTheirStatistics;
+import data.DataPoint;
+import data.Parameters;
+import distance.measures.L2Norm;
+
+import java.awt.Color;
+
 public class TestCluster {
 
+	Cluster cluster;
+	DataPoint [] dataPoints;
+	DataPoint center;
+	Color color;
+	int parentId;
+	int rootId;
+	
+	public TestCluster()
+	{
+		dataPoints = new DataPoint[] {new DataPoint(new double []{2,1},new double []{1,2},"intNam","classAtr"),
+				new DataPoint(new double []{1,2},new double []{1,2},"intNam","classAtr")};
+		center = new DataPoint(new double []{1,2},new double []{1,2},"intNam","classAtr") ;
+		color= new Color(255,255,255);
+		parentId=0;
+		rootId=0;
+		cluster = new Cluster(dataPoints,center,color,parentId,rootId);
+	}
+	
 	@Test
 	public void testClusterDataPointArrayDataPointColorIntInt() {
 		fail("Not yet implemented");
+		//testKonstuktor
 	}
 
 	@Test
 	public void testClusterDataPointArrayDataPointMatrixDoubleColorIntInt() {
 		fail("Not yet implemented");
+		//testKonstuktor
 	}
 
 	@Test
 	public void testGetNumberOfPoints() {
-		fail("Not yet implemented");
+		assertEquals(2, cluster.getNumberOfPoints());
 	}
 
 	@Test
 	public void testGetPoints() {
-		fail("Not yet implemented");
+		assertArrayEquals(dataPoints, cluster.getPoints());
 	}
 
 	@Test
 	public void testSetPoints() {
-		fail("Not yet implemented");
+		DataPoint [] newDataPoint=new DataPoint[] {new DataPoint(new double []{2,2},new double []{2,2},"intNam","classAtr"),
+				new DataPoint(new double []{2,2},new double []{2,2},"intNam","classAtr")};
+		cluster.setPoints(newDataPoint);
+		assertArrayEquals(newDataPoint, cluster.getPoints());
 	}
 
 	@Test
 	public void testGetCenter() {
-		fail("Not yet implemented");
+		assertEquals(center, cluster.getCenter());
 	}
 
 	@Test
 	public void testSetCenter() {
-		fail("Not yet implemented");
+		DataPoint newCenter = new DataPoint(new double []{2,2},new double []{2,2},"intNam","classAtr") ;
+		cluster.setCenter(newCenter);
+		assertEquals(newCenter, cluster.getCenter());
 	}
 
 	@Test
 	public void testPerformSplit() {
 		fail("Not yet implemented");
+		
 	}
 
 	@Test
 	public void testGetMaximumValueOfDataPoints() {
-		fail("Not yet implemented");
+		assertEquals(2, cluster.getMaximumValueOfDataPoints(0),Parameters.getEpsilon());
 	}
 
 	@Test
 	public void testGetMinimumValueOfDataPoints() {
-		fail("Not yet implemented");
+		assertEquals(1, cluster.getMinimumValueOfDataPoints(0),Parameters.getEpsilon());
 	}
 
 	@Test
 	public void testSetAlgorithm() {
-		fail("Not yet implemented");
+		//nie ma jak sprawdzic bo nie ma getera?
+		cluster.setAlgorithm(new Kmeans());
+		cluster.setAlgorithm(new EM());
 	}
 
 	@Test
 	public void testIsStaticCenter() {
-		fail("Not yet implemented");
+		assertEquals(false,cluster.isStaticCenter());
 	}
 
 	@Test
 	public void testSetStaticCenter() {
-		fail("Not yet implemented");
+		assertEquals(false,cluster.isStaticCenter());
+		cluster.setStaticCenter(true);
+		assertEquals(true,cluster.isStaticCenter());
 	}
 
 	@Test
 	public void testGetCovariance() {
-		fail("Not yet implemented");
+		assertEquals(null, cluster.getCovariance());
 	}
 
 	@Test
@@ -83,37 +124,42 @@ public class TestCluster {
 
 	@Test
 	public void testGetMixingCoefficient() {
-		fail("Not yet implemented");
+		assertEquals(0, cluster.getMixingCoefficient(),Parameters.getEpsilon());
 	}
 
 	@Test
 	public void testSetMixingCoefficient() {
-		fail("Not yet implemented");
+		cluster.setMixingCoefficient(5);
+		assertEquals(5, cluster.getMixingCoefficient(),Parameters.getEpsilon());
 	}
 
 	@Test
 	public void testGetColorOnImage() {
-		fail("Not yet implemented");
+		assertEquals(color, cluster.getColorOnImage());
 	}
 
 	@Test
 	public void testSetColorOnImage() {
-		fail("Not yet implemented");
+		Color newColor= new Color(0,0,0);
+		cluster.setColorOnImage(newColor);
+		assertEquals(newColor, cluster.getColorOnImage());
 	}
 
 	@Test
 	public void testGetParentId() {
-		fail("Not yet implemented");
+		assertEquals(parentId, cluster.getParentId());
 	}
 
 	@Test
 	public void testGetClusterId() {
-		fail("Not yet implemented");
+		assertEquals(rootId, cluster.getClusterId());
 	}
 
 	@Test
 	public void testToString() {
-		fail("Not yet implemented");
+		assertEquals("Center: ;Source:;\nNum. of Pts: 2\nMixing coef.: 0.0\nStatic: false\n"
+				+ "Cov. matrix: null\nColour on img.: java.awt.Color[r=255,g=255,b=255]\n"
+				+ "Parent Id: 0\nCluster Id: 0", cluster.toString());
 	}
 
 }

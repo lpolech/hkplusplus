@@ -8,29 +8,32 @@ import data.DataPoint;
 import data.Parameters;
 
 public class TestDataPoint {
-
-	double [] coordinates= {1,2};
-	double [] sourceCoordinates= {1,2};
-	DataPoint datapoint= new DataPoint(coordinates,sourceCoordinates,"instnam","classAt");
-	DataPoint datapoint2= new DataPoint(coordinates,null,"instnam","classAt");
 	
-	@Test
-	public void testDataPoint() {
-		assertNotEquals(sourceCoordinates , datapoint.getSourceCoordinates());
-		assertEquals(null , datapoint2.getSourceCoordinates());
+	double [] coordinates;
+	double [] sourceCoordinates ;
+	DataPoint datapoint;
+	DataPoint datapoint2;
+	
+	public TestDataPoint ()
+	{
+		coordinates = new double [] {1,2};
+		sourceCoordinates = new double [] {1,2};
+		datapoint = new DataPoint(coordinates,sourceCoordinates,"instnam","classAt");
+		datapoint2 = new DataPoint(coordinates,null,"instnam","classAt");
 	}
-
+	
 	@Test
 	public void testGetCoordinate() {
 		assertEquals(1, datapoint.getCoordinate(0), Parameters.getEpsilon());
 		assertEquals(2, datapoint.getCoordinate(1), Parameters.getEpsilon());
-		
 	}
 
 	@Test
 	public void testSetCoordinates() {
-		fail("Not yet implemented");
-		
+		double [] newCordinates = {3,4};
+		datapoint.setCoordinates(newCordinates);
+		assertArrayEquals(newCordinates, datapoint.getCoordinates(),Parameters.getEpsilon());
+		assertNotEquals(newCordinates, datapoint.getCoordinates());
 	}
 
 	@Test
@@ -51,7 +54,13 @@ public class TestDataPoint {
 	
 	@Test
 	public void testSetSourceCoordinates() {
-		fail("Not yet implemented");
+		double [] newSourceCordinates = {3,4};
+		datapoint.setSourceCoordinates(newSourceCordinates);
+		assertArrayEquals(newSourceCordinates, datapoint.getSourceCoordinates(),Parameters.getEpsilon());
+		assertNotEquals(newSourceCordinates, datapoint.getSourceCoordinates());
+		datapoint.setSourceCoordinates(null);
+		assertEquals(null, datapoint.getSourceCoordinates());
+		assertArrayEquals(null, datapoint.getSourceCoordinates(),Parameters.getEpsilon());
 	}
 
 	@Test
@@ -66,8 +75,6 @@ public class TestDataPoint {
 		assertArrayEquals(coordinates, datapoint.getCoordinates(),Parameters.getEpsilon());
 	}
 
-	//moze powinismy inicjowac w konstuktorze ta wartosc? 
-	//choc z drugiej strony wywolywanie iteratorow dla kazdego punktu w duzych zbiorach jest bez sensu
 	@Test
 	public void testGetNumberOfDimensions() {
 		assertEquals(2, datapoint.getNumberOfDimensions());
@@ -83,19 +90,17 @@ public class TestDataPoint {
 	public void testGetMatrix() {
 		assertEquals(datapoint.getNumberOfDimensions(), datapoint.getMatrix().getRowDimension());
 		assertEquals(1, datapoint.getMatrix().getColumnDimension());
-		
-		
 	}
 
 	@Test
 	public void testToString() {
-		//fail("Not yet implemented");
-		//wystarczy ze cokolwiek da
 		datapoint.setNumberOfDimensions(2);
-		System.out.println(datapoint);
+		//System.out.println(datapoint);
+		assertEquals("1.0;2.0;;Source:;1.0;2.0;", datapoint.toString());
 		Parameters.setClassAttribute(true);
 		Parameters.setInstanceName(true);
-		System.out.println(datapoint);
+		//System.out.println(datapoint);
+		assertEquals("Atr: ;classAt;;InstName: ;instnam;;1.0;2.0;;Source:;1.0;2.0;", datapoint.toString());
 	}
 
 	@Test
@@ -113,7 +118,8 @@ public class TestDataPoint {
 
 	@Test
 	public void testSetClassAttribute() {
-		fail("Not yet implemented");
+		datapoint.setClassAttribute("ClassAtribute");
+		assertEquals("ClassAtribute",datapoint.getClassAttribute());
 	}
 
 	@Test
@@ -123,7 +129,8 @@ public class TestDataPoint {
 
 	@Test
 	public void testSetInstanceName() {
-		fail("Not yet implemented");
+		datapoint.setInstanceName("instanceName");
+		assertEquals("instanceName",datapoint.getInstanceName());
 	}
 
 }

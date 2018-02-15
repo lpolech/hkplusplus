@@ -18,15 +18,21 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class TestCentroid {
 
-	static Data inputData;
-	Centroid centroid= new Centroid();
+	Data inputData;
+	Centroid centroid;
+	Cluster cluster;
 	
-	@Test
-	public void testMakeCluster() {
+	public TestCentroid()
+	{
+		centroid= new Centroid();
 		Parameters.setVerbose(true);
 		Parameters.setClassAttribute(true);
 		inputData = DataReader.read(Paths.get("test4.csv"));
-		Cluster cluster = centroid.makeCluster(inputData, new L2Norm());
+	}
+	
+	@Test
+	public void testMakeCluster() {
+		cluster = centroid.makeCluster(inputData, new L2Norm());
 		assertEquals(0.5, cluster.getCenter().getCoordinate(0),Parameters.getEpsilon());
 		assertEquals(0.5, cluster.getCenter().getCoordinate(1),Parameters.getEpsilon());
 		assertEquals(2, cluster.getCenter().getNumberOfDimensions());
@@ -34,9 +40,6 @@ public class TestCentroid {
 
 	@Test
 	public void testUpdateCenter() {
-		Parameters.setVerbose(true);
-		Parameters.setClassAttribute(true);
-		inputData = DataReader.read(Paths.get("test3.csv"));
 		Cluster cluster = centroid.makeCluster(inputData, new L2Norm());
 		Cluster cluster2= centroid.updateCenter(cluster, new  L2Norm());
 		assertEquals(cluster2, cluster);
@@ -44,9 +47,6 @@ public class TestCentroid {
 	
 	@Test(expected = NotImplementedException.class) 
 	public void testUpdateCenterThrowsException()  {
-		Parameters.setVerbose(true);
-		Parameters.setClassAttribute(true);
-		inputData = DataReader.read(Paths.get("test3.csv"));
 		Cluster cluster = centroid.makeCluster(inputData, new GMMBayesMLE());
 		Cluster cluster2= centroid.updateCenter(cluster, new  GMMBayesMLE());
 		assertEquals(cluster2, cluster);
