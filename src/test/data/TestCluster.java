@@ -36,17 +36,6 @@ public class TestCluster {
 		cluster = new Cluster(dataPoints,center,color,parentId,rootId);
 	}
 	
-	@Test
-	public void testClusterDataPointArrayDataPointColorIntInt() {
-		fail("Not yet implemented");
-		//testKonstuktor
-	}
-
-	@Test
-	public void testClusterDataPointArrayDataPointMatrixDoubleColorIntInt() {
-		fail("Not yet implemented");
-		//testKonstuktor
-	}
 
 	@Test
 	public void testGetNumberOfPoints() {
@@ -88,7 +77,7 @@ public class TestCluster {
 	@Test
 	public void testPerformSplit() {
 		cluster.setAlgorithm(new EM());
-		cluster.performSplit(2, 0);
+		//cluster.performSplit(2, 0);
 		fail("Not yet implemented");
 	}
 
@@ -167,6 +156,7 @@ public class TestCluster {
 		assertEquals(rootId, cluster.getClusterId());
 	}
 
+	//jakies parametry z innych testow psuja wynik
 	@Test
 	public void testToString() {
 		Parameters.setClassAttribute(false);

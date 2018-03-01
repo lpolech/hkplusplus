@@ -41,11 +41,6 @@ public class TestClustPtsPostAndSumOfPost {
 		clustPtsPostAndSumOfPost = new ClustPtsPostAndSumOfPost(clusterisation, pointsToMixturePosteriories, clustersSumOfPosteriories);
 	}
 	
-	@Test
-	public void testClustPtsPostAndSumOfPost() {
-		fail("Not yet implemented");
-		//nie wiem czy potrzebujuje tego testu, ale wygenerowal sie z automatu
-	}
 
 	@Test
 	public void testGetClusterisation() {

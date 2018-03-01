@@ -37,12 +37,7 @@ public class TestClustersAndTheirStatistics {
 		statistic=8;
 		clustersAndTheirStatistics=new ClustersAndTheirStatistics(clusters, statistic, false);
 	}
-	
-	@Test
-	public void testClustersAndTheirStatistics() {
-		fail("Not yet implemented");
-		//nie wiem czy potrzebujuje tego testu, ale wygenerowal sie z automatu
-	}
+
 
 	@Test
 	public void testGetClusters() {

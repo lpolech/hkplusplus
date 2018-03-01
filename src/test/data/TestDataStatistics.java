@@ -22,11 +22,6 @@ public class TestDataStatistics {
 		dataStatistics= new DataStatistics(minValues,maxValues, new double []{1,1}, 2, new HashMap<String, Integer>(), new int[] {1,1}, 0);
 	}
 	
-	@Test
-	public void testDataStatistics() {
-		fail("Not yet implemented");
-		//nie wiem czy potrzebujuje tego testu, ale wygenerowal sie z automatu
-	}
 
 	@Test
 	public void testGetMinValues() {

@@ -35,6 +35,7 @@ public class TestUtils {
 
 	@Test
 	public void testGetNextId() {
+		Utils.resetId();
 		assertEquals(0, Utils.getNextId());
 		assertEquals(1, Utils.getNextId());
 		assertEquals(2, Utils.getNextId());

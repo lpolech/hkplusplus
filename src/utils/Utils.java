@@ -37,6 +37,11 @@ public class Utils {
 		
 		return red + Constans.delimiter + green + Constans.delimiter + blue ;
 	}
+	//musialem dorobic do testow metode, 
+	public static void resetId()
+	{
+		id=-1;
+	}
 	
 	public static int getNextId()
 	{
