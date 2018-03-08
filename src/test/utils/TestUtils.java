@@ -67,7 +67,7 @@ public class TestUtils {
 		
 		
 		Utils.startTimer();
-		Thread.sleep(999);
+		Thread.sleep(500);
 		Utils.stopTimer();
 		assertEquals(0, Utils.getTimerSeconds(), Parameters.getEpsilon() );
 		assertEquals(0, Utils.getTimerInMinutes(), Parameters.getEpsilon() );

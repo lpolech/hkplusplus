@@ -36,38 +36,9 @@ public class TestCommon {
 	
 	@Test
 	public void testRun() {
-		assertEquals(null, common.run(0, cluster, 0));
+		assertEquals(null, common.run(1, cluster, 0));
 	}
 
-	@Test
-	public void testChoseSeedPoints() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testIndicesAreDistinct() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testMovePointsIntoClusters() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testPrepareEachClusterPoints() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testFillEachClusterPointsStructure() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetEachClusterPoints() {
-		fail("Not yet implemented");
-	}
 
 	@Test
 	public void testSetMeasure() {

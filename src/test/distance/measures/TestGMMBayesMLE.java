@@ -39,20 +39,20 @@ public class TestGMMBayesMLE {
 		Parameters.setVerbose(false);
 		Parameters.setClassAttribute(false);
 	}
+	
+	//nalezy tak spreparowac metode aby wyznacznik byl bliski zero, ale metoda dzialala, nie wiem jak to zrobic
 	@Test
 	public void testDistance() {
 		Matrix covariance = new Matrix(new double[][] {{1.1 ,1},{1,1}});
+		//Matrix covariance = new Matrix(new double[][] {{0 ,0},{0,0}});
+		
+		
 		cluster.setCovariance(covariance);
 		DataPoint newPoint = new DataPoint(new double []{1. ,1},new double []{1,1},"intNam","classAtr");
 		DataPoint.setNumberOfDimensions(2);
 		
 		//najlepszy test to to nie jest, ale nie wiem jak sensownie przetestowac odleglosci
 		assertEquals(0, gmmBayesMLE.distance(cluster, newPoint), 0.02 );
-	}
-
-	@Test
-	public void testMakeCovMatrixInvertible() {
-		fail("chroniona metoda, nie mam pojecia jak ja przetestowac");
 	}
 
 	@Test(expected = NotImplementedException.class) 

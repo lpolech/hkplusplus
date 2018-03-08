@@ -3,10 +3,16 @@ package test.dendrogram;
 import static org.junit.Assert.*;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.junit.Test;
 
+import algorithms.Kmeans;
 import center.method.Centroid;
 import data.Cluster;
 import data.Data;
@@ -41,78 +47,83 @@ public class TestDendrogramLevel {
 		rootId=0;
 		cluster = new Cluster(dataPoints,center,color,parentId,rootId);
 		
-		Parameters.setVerbose(false);
+		Parameters.setVerbose(true);
 		Parameters.setClassAttribute(false);
+		Parameters.setMaxNumberOfNodes(100);
+		Parameters.setNumberOfClusterisationAlgIterations(10);
+		Parameters.setNumberOfClusterisationAlgRepeats(5);
 		
 		dataStatistics = calculateDataStatistics
 				(dataPoints, new NumberOfPointsAndDataDimension(2,2).getDataDimension(), new HashMap<String, Integer>());
-		data = new Data(dataPoints,2,2, dataStatistics, null);
+		
+		data = new Data(dataPoints,2,2, dataStatistics, (new HashMap<Integer, String>()) );
 		
 		dendrogramLevel= new DendrogramLevel(0, dataStatistics);
+		
+		dendrogramLevel.setDistanceMethod(new Centroid());
+		dendrogramLevel.setMeasure(new L2Norm());
+		dendrogramLevel.makeRoot(data);
+		Parameters.setVerbose(false);
 	}
 	
 	@Test  
 	public void testAllClustersDontHaveEnoughPoints() {
-		dendrogramLevel.setDistanceMethod(new Centroid());
-		dendrogramLevel.setMeasure(new L2Norm());
-		dendrogramLevel.makeRoot(data);
-		assertEquals(false, dendrogramLevel.allClustersDontHaveEnoughPoints(0));
+		assertEquals(false, dendrogramLevel.allClustersDontHaveEnoughPoints(1));
 	}
-	
-	@Test (expected = NullPointerException.class) 
-	public void testAllClustersDontHaveEnoughPointsThrowsNullpointerExp() {
-		assertEquals(false, dendrogramLevel.allClustersDontHaveEnoughPoints(0));
-	}
+
 
 	@Test
 	public void testExpandTree() {
-		//wywala bo cluster[] nie zinicjalizowany, a inicjalizuje sie dopiero w 3 linice funkcji a wymagany w 1 
-		DendrogramLevel newLevel= dendrogramLevel.expandTree(0, 0, dataStatistics, 0);
-	}
-
-	@Test
-	public void testMakeRoot() {
-		fail("Not yet implemented");
+		Cluster.setAlgorithm(new Kmeans());
+		Kmeans.setCenterMethod(new Centroid());
+		Kmeans.setMeasure(new L2Norm());
+		
+		DendrogramLevel newLevel= dendrogramLevel.expandTree(1, 0, dataStatistics, 0);
+		
+		assertEquals(2, newLevel.getClusters().length);
 	}
 
 	@Test
 	public void testWrite() {
-		fail("Not yet implemented");
+		Parameters.setClassAttribute(true);
+		try {
+			Files.deleteIfExists( Paths.get("test/testFile.csv") );
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		dendrogramLevel.write(data, new File("test/testFile.csv"), dataStatistics);
+		
+		assertEquals(true, new File("test/testFile.csv").isFile() );
 	}
 
 	@Test
 	public void testGetImage() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetDistanceMethod() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetMeasure() {
-		fail("Not yet implemented");
+		BufferedImage bufferedImage= dendrogramLevel.getImage();
+		assertNotEquals(null, bufferedImage);
+	
 	}
 
 	@Test
 	public void testGetMeasure() {
-		fail("Not yet implemented");
+		assertEquals(new L2Norm().getClass(), dendrogramLevel.getMeasure().getClass());
 	}
 
 	@Test
 	public void testGetStatistic() {
-		fail("Not yet implemented");
+		assertEquals(1.5 , dendrogramLevel.getStatistic(), 0.1);
 	}
 
 	@Test
 	public void testGetClusters() {
-		fail("Not yet implemented");
+		assertEquals(1, dendrogramLevel.getClusters().length);
 	}
 
+	//pierw ClusterisationStatistics i potem powrot do tego 
 	@Test
 	public void testGetClusterisationStatistics() {
-		fail("Not yet implemented");
+		//Parameters.isClassAttribute() = false wiec clusteryzationstatistic sie nie policzy
+		assertEquals(Double.NaN, dendrogramLevel.getClusterisationStatistics().getFlatClusterisationFMeasure(), 0.1 );
 	}
 	static DataStatistics calculateDataStatistics(
 			DataPoint[] points, int numberOfDimensions, HashMap<String, Integer> classNameAndItsId) {

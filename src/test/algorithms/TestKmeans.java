@@ -46,7 +46,7 @@ public class TestKmeans {
 		
 		Parameters.setVerbose(false);
 		Parameters.setClassAttribute(false);
-		
+		Parameters.setNumberOfClusterisationAlgIterations(10);
 		stats = calculateDataStatistics
 				(dataPoints, new NumberOfPointsAndDataDimension(2,2).getDataDimension(), new HashMap<String, Integer>());
 		data = new Data(dataPoints,2,2, stats, null);
@@ -55,12 +55,11 @@ public class TestKmeans {
 	//jakies parametry z innych testow psuja wynik
 	@Test
 	public void testRun() {
-		
+		Kmeans.setCenterMethod(new Centroid());
 		Kmeans.setMeasure(new L2Norm());
 		int liczbaBezZnaczenia = 0;
-		ClustersAndTheirStatistics clustersAndTheirStatistics = kmeans.run(0, cluster, liczbaBezZnaczenia);
-		assertEquals(1, clustersAndTheirStatistics.getClusters().length);
-		assertEquals(cluster, clustersAndTheirStatistics.getClusters()[0]);
+		ClustersAndTheirStatistics clustersAndTheirStatistics = kmeans.run(1, cluster, liczbaBezZnaczenia);
+		assertEquals(2, clustersAndTheirStatistics.getClusters().length);
 	}
 
 	@Test

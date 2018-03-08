@@ -8,6 +8,7 @@ import Jama.Matrix;
 import algorithms.Algorithm;
 import algorithms.EM;
 import algorithms.Kmeans;
+import center.method.Centroid;
 import data.Cluster;
 import data.ClustersAndTheirStatistics;
 import data.DataPoint;
@@ -67,20 +68,20 @@ public class TestCluster {
 		assertEquals(newCenter, cluster.getCenter());
 	}
 	
-	@Test (expected = java.lang.NullPointerException.class) 
-	public void testPerformSplitBefforSetAlgorithm() {
-		cluster.performSplit(2, 0);
-		fail("Not yet implemented");
-	}
-	
-	//TODO wrocic do tego gdy zrobimy ut dla EM lub Kmeans
 	@Test
 	public void testPerformSplit() {
-		cluster.setAlgorithm(new EM());
-		//cluster.performSplit(2, 0);
-		fail("Not yet implemented");
+		Parameters.setVerbose(false);
+		Parameters.setClassAttribute(false);
+		Parameters.setNumberOfClusterisationAlgIterations(10);
+		Kmeans.setCenterMethod(new Centroid());
+		Kmeans.setMeasure(new L2Norm());
+		
+		Cluster.setAlgorithm( new Kmeans());
+		
+		ClustersAndTheirStatistics clustersAndTheirStatistics= cluster.performSplit(1, 0);
+		assertEquals(2, clustersAndTheirStatistics.getClusters().length);
 	}
-
+	
 	@Test
 	public void testGetMaximumValueOfDataPoints() {
 		assertEquals(2, cluster.getMaximumValueOfDataPoints(0),Parameters.getEpsilon());
@@ -161,7 +162,9 @@ public class TestCluster {
 	public void testToString() {
 		Parameters.setClassAttribute(false);
 		Parameters.setInstanceName(false);
-		assertEquals("Center: ;Source:;\nNum. of Pts: 2\nMixing coef.: 0.0\nStatic: false\n"
+		DataPoint.setNumberOfDimensions(2);
+		
+		assertEquals("Center: 1.0;2.0;;Source:;1.0;2.0;\nNum. of Pts: 2\nMixing coef.: 0.0\nStatic: false\n"
 				+ "Cov. matrix: null\nColour on img.: java.awt.Color[r=255,g=255,b=255]\n"
 				+ "Parent Id: 0\nCluster Id: 0", cluster.toString());
 	}

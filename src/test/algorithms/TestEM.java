@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
+import Jama.Matrix;
 import algorithms.EM;
 import algorithms.Kmeans;
 import data.Cluster;
@@ -50,7 +51,7 @@ public class TestEM {
 		data = new Data(dataPoints,2,2, stats, null);
 	}
 	
-	//jakies parametry z innych testow psuja wynik
+	//jakies parametry z innych testow psuja wynik nie wiem jakie dalej
 	@Test
 	public void testRun() {
 		EM.setMeasure(new L2Norm());
@@ -63,10 +64,16 @@ public class TestEM {
 	@Test
 	public void testRunSecondBranch() {	
 		EM.setMeasure(new L2Norm());
-		Parameters.setMaxNumberOfNodes(5);
-		ClustersAndTheirStatistics clustersAndTheirStatistics = em.run(0, cluster, 0);
+		Parameters.setMaxNumberOfNodes(10);
+		Parameters.setClusterReestimationBasedOnItsData(true);
+		
+		Matrix covariance= new Matrix(2, 2);
+		cluster.setCovariance(covariance);
+		cluster.setStaticCenter(true);
+		
+		Parameters.setNumberOfClusterisationAlgIterations(10);
+		ClustersAndTheirStatistics clustersAndTheirStatistics = em.run(1, cluster, 0);
 		assertEquals(1, clustersAndTheirStatistics.getClusters().length);
-		assertEquals(cluster, clustersAndTheirStatistics.getClusters()[0]);
 	}
 
 	@Test

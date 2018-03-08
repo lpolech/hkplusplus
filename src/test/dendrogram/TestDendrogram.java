@@ -2,12 +2,15 @@ package test.dendrogram;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 import data.Data;
 import data.DataReader;
 import data.Parameters;
 import dendrogram.Dendrogram;
+import dendrogram.DendrogramLevel;
 import utils.CmdLineParser;
 import utils.Utils;
 
@@ -21,7 +24,7 @@ public class TestDendrogram {
 			"-s", "2",
 			"-v",
 			"-o", "out",//.concat(String.valueOf(L)).concat("_E").concat(String.valueOf(E)),
-			"-k", "5",
+			"-k", "1",
 			"-n", "1",//40//60 back
 			"-r", "1",//10 //60 back
 //			"-d", "testowe.list",
@@ -40,52 +43,52 @@ public class TestDendrogram {
 //			"-cf", "0.88",
 //			"-re"
 	};
-	CmdLineParser parser = new CmdLineParser();
+	CmdLineParser parser;
+	Data inputData;
+	Dendrogram dendrogram;
 	
+	public TestDendrogram()
+	{
+		parser = new CmdLineParser();
+		parser.parse(args);
+		inputData = DataReader.read(Parameters.getInputDataFilePath());
+		dendrogram = new Dendrogram(inputData, Parameters.getMethod(), Parameters.getK(),
+				Parameters.getDendrogramMaxHeight(), Parameters.getOutputFolder());
+	}
 	
 	@Test
 	public void testDendrogram() {
-		parser.parse(args);
-		Data inputData = DataReader.read(Parameters.getInputDataFilePath());
-		Dendrogram dendrogram = new Dendrogram(inputData, Parameters.getMethod(), Parameters.getK(),
-				Parameters.getDendrogramMaxHeight(), Parameters.getOutputFolder());
 		
-		dendrogram.run();
+		ArrayList<DendrogramLevel> list= dendrogram.run();
+		assertEquals(2,list.size());
 		
-		System.out.println("\nDendrogram bottom statistic: " + dendrogram.getFinalStatistic() + "\n");
-		Utils.stopTimer();
-		System.out.println("Whole program run: " + Utils.getTimerReport());
-		
-		System.out.println("\nDendrogram hierarchy rep: " + dendrogram.getHierarchyRepresentation() + "\n");
-
-		System.out.println("\nDendrogram get den: " + dendrogram.getDendrogram().get(0) + "\n");
-		//fail("Not yet implemented");
 	}
 
 
 	@Test
 	public void testSaveSummaryStatistics() {
-		fail("Not yet implemented");
+		//funkcja wykorzystywana przy dendrogram.run();
 	}
 
 	@Test
 	public void testGetHierarchyRepresentation() {
-		fail("Not yet implemented");
+		assertEquals(1, dendrogram.getHierarchyRepresentation().getNumberOfGroups());
 	}
 
+	//tez jakis parametr zmienia wartosc wyjsciowa, 
 	@Test
 	public void testGetFinalStatistic() {
-		fail("Not yet implemented");
+		assertEquals(-46427, dendrogram.getFinalStatistic(), 1);
 	}
 
 	@Test
 	public void testGetPoints() {
-		fail("Not yet implemented");
+		assertEquals(9999, dendrogram.getPoints().getNumberOfPoints());
 	}
 
 	@Test
 	public void testGetDendrogram() {
-		fail("Not yet implemented");
+		assertEquals(1, dendrogram.getDendrogram().size());
 	}
 
 }
