@@ -9,8 +9,8 @@ import data.Parameters;
 import utils.Utils;
 
 public class LOG_GMMBayesMLE extends GMMBayesMLE implements Measure {
-	private final static double  minusHalfOfDimMultipliedByLogOfTWO = (-1.0)*(DataPoint.getNumberOfDimensions()/2.0)*Math.log(2);
-	private final static double minusHalfOfDimMultipliedByLogOfPI = (-1.0)*(DataPoint.getNumberOfDimensions()/2.0)*Math.log(Math.PI);
+	private double minusHalfOfDimMultipliedByLogOfTWO = (-1.0)*(DataPoint.getNumberOfDimensions()/2.0)*Math.log(2);
+	private double minusHalfOfDimMultipliedByLogOfPI = (-1.0)*(DataPoint.getNumberOfDimensions()/2.0)*Math.log(Math.PI);
 	
 	@Override
 	public double distance(Cluster cluster, DataPoint point) { //funkcja gestosci rozkladu normalnego (pdf)
