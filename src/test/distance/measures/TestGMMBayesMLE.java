@@ -34,6 +34,7 @@ public class TestGMMBayesMLE {
 		parentId=0;
 		rootId=0;
 		cluster = new Cluster(dataPoints,center,color,parentId,rootId);
+		DataPoint.setNumberOfDimensions(2);
 		gmmBayesMLE = new GMMBayesMLE();
 		
 		Parameters.setVerbose(false);

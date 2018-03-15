@@ -33,6 +33,7 @@ public class TestLOG_GMMBayesMLE {
 		parentId=0;
 		rootId=0;
 		cluster = new Cluster(dataPoints,center,color,parentId,rootId);
+		DataPoint.setNumberOfDimensions(2);
 		log_GMMBayesMLE = new LOG_GMMBayesMLE();
 		
 		Parameters.setVerbose(false);
@@ -48,7 +49,6 @@ public class TestLOG_GMMBayesMLE {
 		
 		cluster.setCovariance(covariance);
 		DataPoint newPoint = new DataPoint(new double []{1. ,1},new double []{1,1},"intNam","classAtr");
-		DataPoint.setNumberOfDimensions(2);
 		
 		//najlepszy test to to nie jest, ale nie wiem jak sensownie przetestowac odleglosci
 		assertEquals(-6.18, log_GMMBayesMLE.distance(cluster, newPoint), 0.1 );
