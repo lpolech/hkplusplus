@@ -24,7 +24,7 @@ public class TestDendrogram {
 			"-s", "2",
 			"-v",
 			"-o", "out",//.concat(String.valueOf(L)).concat("_E").concat(String.valueOf(E)),
-			"-k", "1",
+			"-k", "2",
 			"-n", "1",//40//60 back
 			"-r", "1",//10 //60 back
 //			"-d", "testowe.list",
@@ -56,12 +56,14 @@ public class TestDendrogram {
 				Parameters.getDendrogramMaxHeight(), Parameters.getOutputFolder());
 	}
 	
+	//TODO wiecej testow tutaj
 	@Test
 	public void testDendrogram() {
-		
+
 		ArrayList<DendrogramLevel> list= dendrogram.run();
 		assertEquals(2,list.size());
-		
+		assertEquals(1,list.get(0).getClusters().length);
+		assertEquals(3,list.get(1).getClusters().length);
 	}
 
 
@@ -78,12 +80,12 @@ public class TestDendrogram {
 	//tez jakis parametr zmienia wartosc wyjsciowa, 
 	@Test
 	public void testGetFinalStatistic() {
-		assertEquals(-46427, dendrogram.getFinalStatistic(), 1);
+		assertEquals(-12, dendrogram.getFinalStatistic(), 1);
 	}
 
 	@Test
 	public void testGetPoints() {
-		assertEquals(9999, dendrogram.getPoints().getNumberOfPoints());
+		assertEquals(10, dendrogram.getPoints().getNumberOfPoints());
 	}
 
 	@Test

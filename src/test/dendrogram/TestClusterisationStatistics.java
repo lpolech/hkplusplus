@@ -28,6 +28,8 @@ public class TestClusterisationStatistics {
 	int rootId;
 	DendrogramLevel dendrogramLevel;
 	DataStatistics dataStatistics; 
+	DataStatistics dataStatistics2; 
+	
 	Data data;
 	ClusterisationStatistics clusterisationStatistics;
 	public TestClusterisationStatistics() {
@@ -46,21 +48,20 @@ public class TestClusterisationStatistics {
 		Parameters.setNumberOfClusterisationAlgIterations(10);
 		Parameters.setNumberOfClusterisationAlgRepeats(5);
 		
+		Parameters.setClassAttribute(true);
 		
 		HashMap<String, Integer> map= new HashMap<String, Integer>();
 		map.put("classAtr", 0);
 		
-		Parameters.setClassAttribute(true);
-		
-		dataStatistics = calculateDataStatistics
-				(dataPoints, new NumberOfPointsAndDataDimension(2,2).getDataDimension(), map);
+		dataStatistics=new DataStatistics(new double [] {1,1}, new double [] {2,2}, new double[] {1,1},
+				2, map, new int [] {2}, 0);
 		
 		data = new Data(dataPoints,2,2, dataStatistics, (new HashMap<Integer, String>()) );
 		
 		dendrogramLevel= new DendrogramLevel(0, dataStatistics);
 		
-		dendrogramLevel.setDistanceMethod(new Centroid());
-		dendrogramLevel.setMeasure(new L2Norm());
+		DendrogramLevel.setDistanceMethod(new Centroid());
+		DendrogramLevel.setMeasure(new L2Norm());
 		dendrogramLevel.makeRoot(data);
 		Parameters.setVerbose(false);
 		
@@ -144,73 +145,5 @@ public class TestClusterisationStatistics {
 		assertEquals(0,clusterisationStatistics.getPartialOrderFscore(), 0.1);
 		clusterisationStatistics.setPartialOrderFscore(1.0);
 		assertEquals(1.0,clusterisationStatistics.getPartialOrderFscore(), 0.1);
-	}
-
-	static DataStatistics calculateDataStatistics(
-			DataPoint[] points, int numberOfDimensions, HashMap<String, Integer> classNameAndItsId) {
-		double[] minValues = new double[numberOfDimensions];
-		double[] maxValues = new double[numberOfDimensions];
-		double[] eachDimNormalisationInterval = new double[numberOfDimensions];
-		
-		for(int i = 0; i < numberOfDimensions; i++)
-		{
-			minValues[i] = Double.MAX_VALUE;
-			maxValues[i] = Double.MIN_VALUE;
-		}
-		
-		for(DataPoint p: points)
-		{
-			for(int i = 0; i < numberOfDimensions; i++)
-			{
-				if(p.getCoordinate(i) < minValues[i])
-				{
-					minValues[i] = p.getCoordinate(i);
-				}
-				if(p.getCoordinate(i) > maxValues[i])
-				{
-					maxValues[i] = p.getCoordinate(i);
-				}
-			}
-		}
-		
-		int[] eachClassNumberOfInstanceWithInheritance = null;
-		int numberOfNoisePoints = 0;
-		if(Parameters.isClassAttribute())
-		{
-			eachClassNumberOfInstanceWithInheritance = new int[classNameAndItsId.size()];
-			for(DataPoint p: points)
-			{
-				if(p.getClassAttribute().contains("Noise"))
-				{
-					numberOfNoisePoints++;
-				}
-				else
-				{
-					String classAttrib = p.getClassAttribute();
-					eachClassNumberOfInstanceWithInheritance[classNameAndItsId.get(classAttrib)]++;
-					for(String potentialParentClass: classNameAndItsId.keySet())
-					{
-						if(potentialParentClass.length() < classAttrib.length() 
-							&& classAttrib.startsWith(potentialParentClass + basic_hierarchy.common.Constants.HIERARCHY_BRANCH_SEPARATOR))
-						{
-							eachClassNumberOfInstanceWithInheritance[classNameAndItsId.get(potentialParentClass)]++;
-						}
-					}
-				}
-			}
-		}
-		
-		for(int i = 0; i < numberOfDimensions; i++)
-		{
-			eachDimNormalisationInterval[i] = maxValues[i] - minValues[i];
-			if(minValues[i] == maxValues[i])
-			{
-				System.err.println("DataReader.calculateDataStatistics(..) Warning, found min and max values are equal!"
-						+ " This means, that on dimension number " + i + " there is no diferent values.");
-			}
-		}
-		
-		return new DataStatistics(minValues, maxValues, eachDimNormalisationInterval, points.length, classNameAndItsId, 
-				eachClassNumberOfInstanceWithInheritance, numberOfNoisePoints);
 	}
 }

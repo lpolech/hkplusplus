@@ -51,7 +51,7 @@ public class TestLOG_GMMBayesMLE {
 		DataPoint.setNumberOfDimensions(2);
 		
 		//najlepszy test to to nie jest, ale nie wiem jak sensownie przetestowac odleglosci
-		assertEquals(-4.4, log_GMMBayesMLE.distance(cluster, newPoint), 0.1 );
+		assertEquals(-6.18, log_GMMBayesMLE.distance(cluster, newPoint), 0.1 );
 	}
 
 	//jakies parametry z innych testow psuja wynik
