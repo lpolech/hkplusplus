@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.junit.Test;
 
 import data.Data;
+import data.DataPoint;
 import data.DataReader;
 import data.Parameters;
 import dendrogram.Dendrogram;
@@ -81,7 +82,8 @@ public class TestDendrogram {
 	//tez jakis parametr zmienia wartosc wyjsciowa, 
 	@Test
 	public void testGetFinalStatistic() {
-		assertEquals(-12, dendrogram.getFinalStatistic(), 1);
+		DataPoint.setNumberOfDimensions(2);
+		assertEquals(-15, dendrogram.getFinalStatistic(), 1);
 	}
 
 	@Test
