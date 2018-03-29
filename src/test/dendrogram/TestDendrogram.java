@@ -53,12 +53,10 @@ public class TestDendrogram {
 		parser = new CmdLineParser();
 		parser.parse(args);
 		inputData = DataReader.read(Parameters.getInputDataFilePath());
-		//jezeli jeden wymiar takie same wartosi to sie sypie
 		dendrogram = new Dendrogram(inputData, Parameters.getMethod(), Parameters.getK(),
 				Parameters.getDendrogramMaxHeight(), Parameters.getOutputFolder());
 	}
 	
-	//TODO wiecej testow tutaj
 	@Test
 	public void testDendrogram() {
 
