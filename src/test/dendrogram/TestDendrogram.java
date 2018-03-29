@@ -17,32 +17,21 @@ import utils.Utils;
 
 public class TestDendrogram {
 	String[] args = new String[]{
-//			"-i", "E:/VirtualBox_Shared/mat_ORG_rozmiary_Edge_tool_n03265032/Edge_tool.sbow.csv",//"Edge_tool.sbowSIMPLE_BINARY_SEARCH/375.csv",//"easy3Simply.txt",
 			"-i", "test.csv",
-//			"-h",
-//			"-gmm",
 			"-lgmm",
 			"-s", "2",
 			"-v",
-			"-o", "out",//.concat(String.valueOf(L)).concat("_E").concat(String.valueOf(E)),
+			"-o", "out",
 			"-k", "2",
-			"-n", "1",//40//60 back
-			"-r", "1",//10 //60 back
-//			"-d", "testowe.list",
+			"-n", "1",
+			"-r", "1",
 			"-e", "10",
 			"-l", "0",
 			"-c",
 			"-dm",
-			"-gi", //"666",
+			"-gi",
 			"-w", "2147483600",
 			"-in",
-//			"-ds",
-//			"-scac",
-//			"-sccs",
-//			"-scrs",
-//			"-rf", "0.5",
-//			"-cf", "0.88",
-//			"-re"
 	};
 	CmdLineParser parser;
 	Data inputData;
@@ -66,18 +55,11 @@ public class TestDendrogram {
 		assertEquals(3,list.get(1).getClusters().length);
 	}
 
-
-	@Test
-	public void testSaveSummaryStatistics() {
-		//funkcja wykorzystywana przy dendrogram.run();
-	}
-
 	@Test
 	public void testGetHierarchyRepresentation() {
 		assertEquals(1, dendrogram.getHierarchyRepresentation().getNumberOfGroups());
 	}
 
-	//tez jakis parametr zmienia wartosc wyjsciowa, 
 	@Test
 	public void testGetFinalStatistic() {
 		DataPoint.setNumberOfDimensions(2);

@@ -97,11 +97,9 @@ public class TestDataPoint {
 		Parameters.setClassAttribute(false);
 		Parameters.setInstanceName(false);
 		datapoint.setNumberOfDimensions(2);
-		//System.out.println(datapoint);
 		assertEquals("1.0;2.0;;Source:;1.0;2.0;", datapoint.toString());
 		Parameters.setClassAttribute(true);
 		Parameters.setInstanceName(true);
-		//System.out.println(datapoint);
 		assertEquals("Atr: ;classAt;;InstName: ;instnam;;1.0;2.0;;Source:;1.0;2.0;", datapoint.toString());
 	}
 

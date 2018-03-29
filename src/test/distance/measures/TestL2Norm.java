@@ -48,7 +48,6 @@ L2Norm l2Norm;
 		DataPoint newPoint = new DataPoint(new double []{1. ,1},new double []{1,1},"intNam","classAtr");
 		DataPoint.setNumberOfDimensions(2);
 		
-		//najlepszy test to to nie jest, ale nie wiem jak przetestowac odleglosci
 		assertEquals(1.0, l2Norm.distance(cluster, newPoint), 0.005 );
 	}
 
@@ -63,14 +62,14 @@ L2Norm l2Norm;
 	@Test
 	public void testCalculateClusterisationStatistic() {
 		double clusterisationStatistic = l2Norm.calculateClusterisationStatistic(new Cluster[] {cluster});
-		//najlepszy test to to nie jest, ale nie wiem jak przetestowac odleglosci
+
 		assertEquals(1.5, clusterisationStatistic, 0.1);
 	}
 
 	@Test
 	public void testParticularClusterInterDistance() {
 		double particuloarClusterInerDistance = l2Norm.particularClusterInterDistance(cluster);
-		//najlepszy test to to nie jest, ale nie wiem jak przetestowac odleglosci
+
 		assertEquals(1.5, particuloarClusterInerDistance, 0.1);
 	}
 
@@ -83,7 +82,7 @@ L2Norm l2Norm;
 
 	@Test
 	public void testPrintClusterisationStatisticName() {
-		//metoda super
+	
 		assertEquals("Sum of Inter cluster distances",  l2Norm.printClusterisationStatisticName());
 	}
 

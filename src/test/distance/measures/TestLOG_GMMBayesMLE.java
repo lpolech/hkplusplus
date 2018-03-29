@@ -40,30 +40,22 @@ public class TestLOG_GMMBayesMLE {
 		Parameters.setClassAttribute(false);
 	}
 	
-	//jakies parametry z innych testow psuja wynik ale nie wiem jakie, bede musial zapytac o to znow 
-	//nalezy tak spreparowac metode aby wyznacznik byl bliski zero, ale metoda dzialala, nie wiem jak to zrobic
 	@Test
 	public void testDistance() {
 		Matrix covariance = new Matrix(new double[][] {{1.1 ,1},{1,1}});
-		//Matrix covariance = new Matrix(new double[][] {{0 ,0},{0,0}});
-		
 		cluster.setCovariance(covariance);
 		DataPoint newPoint = new DataPoint(new double []{1. ,1},new double []{1,1},"intNam","classAtr");
 		
-		//najlepszy test to to nie jest, ale nie wiem jak sensownie przetestowac odleglosci
 		assertEquals(-6.18, log_GMMBayesMLE.distance(cluster, newPoint), 0.1 );
 	}
 
-	//jakies parametry z innych testow psuja wynik
 	@Test
 	public void testCalculateClusterisationStatistic() {
 		Matrix covariance = new Matrix(new double[][] {{1.1 ,1},{1,1}});
 		cluster.setCovariance(covariance);
 		DataPoint.setNumberOfDimensions(2);
 		
-		
 		double clusterisationStatistic = log_GMMBayesMLE.calculateClusterisationStatistic(new Cluster[] {cluster});
-		//najlepszy test to to nie jest, ale nie wiem jak przetestowac odleglosci
 		assertEquals(-Double.MAX_VALUE,  clusterisationStatistic, 0.1);
 		fail("Fix needed");
 	}

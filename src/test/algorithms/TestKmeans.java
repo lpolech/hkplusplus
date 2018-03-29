@@ -56,7 +56,6 @@ public class TestKmeans {
 		data = new Data(dataPoints,2,2, stats, null);
 	}
 	
-	//jakies parametry z innych testow psuja wynik
 	@Test
 	public void testRun() {
 		Kmeans.setCenterMethod(new Centroid());

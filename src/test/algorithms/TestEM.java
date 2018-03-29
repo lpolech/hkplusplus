@@ -56,7 +56,6 @@ public class TestEM {
 		data = new Data(dataPoints,2,2, stats, null);
 	}
 	
-	//jakies parametry z innych testow psuja wynik nie wiem jakie dalej
 	@Test
 	public void testRun() {
 		EM.setMeasure(new L2Norm());
@@ -66,7 +65,7 @@ public class TestEM {
 		assertEquals(cluster, clustersAndTheirStatistics.getClusters()[0]);
 	}
 	
-	//normalnie failuje ale po jakis parametrach z innych testow przechodzi
+
 	@Test
 	public void testRunSecondBranch() {	
 		EM.setMeasure(new L2Norm());
@@ -90,7 +89,6 @@ public class TestEM {
 		assertEquals(0, newCluster.getPoints()[0].getCoordinate(1), Parameters.getEpsilon());
 		assertEquals(0, newCluster.getPoints()[1].getCoordinate(0), Parameters.getEpsilon());
 		assertEquals(1, newCluster.getPoints()[1].getCoordinate(1), Parameters.getEpsilon());
-		
 	}
 
 	@Test

@@ -21,7 +21,6 @@ public class TestCommon {
 	int rootId;
 	Common common;
 	
-	//Jak dostac sie do metod protected z obiektu? i jak je testowac?
 	public TestCommon()
 	{
 		dataPoints = new DataPoint[] {new DataPoint(new double []{2,1},new double []{1,2},"intNam","classAtr"),

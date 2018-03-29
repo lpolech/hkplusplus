@@ -41,18 +41,14 @@ public class TestGMMBayesMLE {
 		Parameters.setClassAttribute(false);
 	}
 	
-	//nalezy tak spreparowac metode aby wyznacznik byl bliski zero, ale metoda dzialala, nie wiem jak to zrobic
 	@Test
 	public void testDistance() {
 		Matrix covariance = new Matrix(new double[][] {{1.1 ,1},{1,1}});
-		//Matrix covariance = new Matrix(new double[][] {{0 ,0},{0,0}});
-		
 		
 		cluster.setCovariance(covariance);
 		DataPoint newPoint = new DataPoint(new double []{1. ,1},new double []{1,1},"intNam","classAtr");
 		DataPoint.setNumberOfDimensions(2);
 		
-		//najlepszy test to to nie jest, ale nie wiem jak sensownie przetestowac odleglosci
 		assertEquals(0, gmmBayesMLE.distance(cluster, newPoint), 0.02 );
 	}
 
@@ -70,10 +66,8 @@ public class TestGMMBayesMLE {
 		Matrix covariance = new Matrix(new double[][] {{1.1 ,1},{1,1}});
 		cluster.setCovariance(covariance);
 		DataPoint.setNumberOfDimensions(2);
-		
-		
 		double clusterisationStatistic = gmmBayesMLE.calculateClusterisationStatistic(new Cluster[] {cluster});
-		//najlepszy test to to nie jest, ale nie wiem jak przetestowac odleglosci
+	
 		assertEquals( Double.NEGATIVE_INFINITY, clusterisationStatistic, 0.1);
 		fail("Fix needed");
 	}

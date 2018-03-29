@@ -16,8 +16,6 @@ public class TestCmdLineParser {
 	public void testCmdLineParser() {
 		String[] args = new String[]{
 				"-i", "test.csv",
-//				"-h",
-//				"-gmm",
 				"-lgmm",
 				"-s", "2",
 				"-v",
@@ -32,13 +30,6 @@ public class TestCmdLineParser {
 				"-gi", "900",
 				"-w", "2147483600",
 				"-in",
-//				"-ds",
-//				"-scac",
-//				"-sccs",
-//				"-scrs",
-//				"-rf", "0.5",
-//				"-cf", "0.88",
-//				"-re"
 		};
 		CmdLineParser parser = new CmdLineParser();
 		parser.parse(args);
@@ -69,9 +60,7 @@ public class TestCmdLineParser {
 		
 		args = new String[]{
 				"-i", "test.csv",
-//				"-h",
 				"-gmm",
-//				"-lgmm",
 				"-s", "2",
 				"-v",
 				"-o", "out",

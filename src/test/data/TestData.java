@@ -38,11 +38,6 @@ public class TestData {
 				2, map, new int [] {2}, 0);
 		data = new Data(datapoints,2,2, stats, null);
 	}
-	
-	@Test
-	public void testData() {
-		//fail("Not yet implemented");
-	}
 
 	@Test
 	public void testGetDimensionNumberAndItsName() {

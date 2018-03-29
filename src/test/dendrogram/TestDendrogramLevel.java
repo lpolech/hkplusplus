@@ -72,7 +72,6 @@ public class TestDendrogramLevel {
 		assertEquals(false, dendrogramLevel.allClustersDontHaveEnoughPoints(1));
 	}
 
-
 	@Test
 	public void testExpandTree() {
 		Cluster.setAlgorithm(new Kmeans());
@@ -119,11 +118,9 @@ public class TestDendrogramLevel {
 	public void testGetClusters() {
 		assertEquals(1, dendrogramLevel.getClusters().length);
 	}
-
-	//pierw ClusterisationStatistics i potem powrot do tego 
+ 
 	@Test
 	public void testGetClusterisationStatistics() {
-		//Parameters.isClassAttribute() = false wiec clusteryzationstatistic sie nie policzy
 		assertEquals(Double.NaN, dendrogramLevel.getClusterisationStatistics().getFlatClusterisationFMeasure(), 0.1 );
 	}
 	
