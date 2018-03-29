@@ -90,6 +90,7 @@ public class DataReader {
 		
 		try(Scanner scanner = new Scanner(inputFilePath))
 		{
+			
             scanner.nextLine();//skip column names
 			while(scanner.hasNextLine())
 			{
@@ -108,6 +109,7 @@ public class DataReader {
 					readPointsCounter++;
 				}
 			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

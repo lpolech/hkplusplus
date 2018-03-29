@@ -10,19 +10,13 @@ public class DataPoint {
 	private String classAttribute;
 	private String instanceName;
 	
+	
 	public DataPoint(double[] coordinates, double[] sourceCoordinates, String instanceName, String classAttribute)
 	{
 		this.setCoordinates(coordinates);
 		this.setClassAttribute(classAttribute);
 		this.setInstanceName(instanceName);
-		if(sourceCoordinates != null)
-		{
-			this.setSourceCoordinates(sourceCoordinates);
-		}
-		else
-		{
-			this.sourceCoordinates = null;
-		}
+		this.setSourceCoordinates(sourceCoordinates);
 	}
 	
 	public double getCoordinate(int number)
@@ -32,6 +26,7 @@ public class DataPoint {
 	
 	public void setCoordinates(double[] coordinates)
 	{
+		
 		this.coordinates = coordinates.clone();
 	}
 	
@@ -45,9 +40,17 @@ public class DataPoint {
 		return sourceCoordinates[number];
 	}
 	
+	//przesuniecie warunku z konstruktora do setera
 	public void setSourceCoordinates(double[] sourceCoordinates)
 	{
-		this.sourceCoordinates = sourceCoordinates.clone();
+		if(sourceCoordinates != null)
+		{
+			this.sourceCoordinates = sourceCoordinates.clone();
+		}
+		else
+		{
+			this.sourceCoordinates = null;
+		}
 	}
 	
 	public void setCoordinate(int number, double value)
