@@ -53,6 +53,9 @@ public class EM extends Common implements CenterMethod {
 		
 		while(stopCriterionNotMet(iterationNumber))
 		{
+//			if(Parameters.isVerbose()) {
+//				System.out.println("iteration " + iterationNumber);
+//			}
 			//these two lines below are the elements of Maximization step, but for performance reasons they are here
 			pointsToMixturePosteriories = calculateEachPointToEachMixturePosterioriProb(parent, clusterisation);
 			clustersSumOfPosteriories = calculateSumOfAllPointsResponsibility(parent, clusterisation, pointsToMixturePosteriories);
@@ -127,10 +130,10 @@ public class EM extends Common implements CenterMethod {
 			if(!clusterisation[i].isStaticCenter() && clusterisation[i].getPoints().length == 0)
 			{
 				toRemove[i] = true;
-//				if(Parameters.isVerbose())
-//				{
-//					System.err.println("Removing cluster number " + i + " because it's empty.");
-//				}
+				if(Parameters.isVerbose())
+				{
+					System.err.println("Removing cluster number " + i + " because it's empty.");
+				}
 			}
 			else
 			{
@@ -653,7 +656,7 @@ public class EM extends Common implements CenterMethod {
 								(points[k].getCoordinate(j)-center.getCoordinate(j));
 					}
 				}
-				//TODO n-1 poniewaz kowariancja próbki a nie populacji
+				//TODO n-1 poniewaz kowariancja probki a nie populacji
 				covariance /= (points.length-1);
 				covarianceMatrixValues[i][j] = covariance;
 			}

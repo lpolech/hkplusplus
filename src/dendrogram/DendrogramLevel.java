@@ -65,6 +65,9 @@ public class DendrogramLevel {
 				}
 				for(int j = 0; j < Parameters.getNumberOfClusterisationAlgRepeats(); j++)
 				{
+//					if(Parameters.isVerbose()) {
+//						System.out.println("repeat " + j);
+//					}
 					newClusters = clusters[i].performSplit(k, numberOfAlreadyCreatedNodes);
 					if(measure.compareStatistics(bestFoundClusterisation.getClusterisationStatistic(), newClusters.getClusterisationStatistic()) <= 0)
 					{

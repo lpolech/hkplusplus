@@ -289,7 +289,7 @@ public class Dendrogram {
 	private void computeDendrogramStatistics(DendrogramLevel newLevel) {
 		double hierarchicalFMeasure = Double.NaN;
 		
-		if(Parameters.isClassAttribute())//Exteran measures
+		if(Parameters.isClassAttribute())//Exteranal measures
 		{
 			hierarchicalFMeasure = calculateHierarchicalFMeasure();
 		}
