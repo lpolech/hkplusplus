@@ -11,7 +11,6 @@ import data.Cluster;
 import data.DataPoint;
 import data.Parameters;
 import distance.measures.GMMBayesMLE;
-import distance.measures.L2Norm;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class TestGMMBayesMLE {

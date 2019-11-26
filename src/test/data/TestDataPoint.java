@@ -77,18 +77,18 @@ public class TestDataPoint {
 
 	@Test
 	public void testGetNumberOfDimensions() {
-		assertEquals(2, datapoint.getNumberOfDimensions());
+		assertEquals(2, DataPoint.getNumberOfDimensions());
 	}
 
 	@Test
 	public void testSetNumberOfDimensions() {
-		datapoint.setNumberOfDimensions(2);
-		assertEquals(2, datapoint.getNumberOfDimensions());
+		DataPoint.setNumberOfDimensions(2);
+		assertEquals(2, DataPoint.getNumberOfDimensions());
 	}
 
 	@Test
 	public void testGetMatrix() {
-		assertEquals(datapoint.getNumberOfDimensions(), datapoint.getMatrix().getRowDimension());
+		assertEquals(DataPoint.getNumberOfDimensions(), datapoint.getMatrix().getRowDimension());
 		assertEquals(1, datapoint.getMatrix().getColumnDimension());
 	}
 
@@ -96,7 +96,7 @@ public class TestDataPoint {
 	public void testToString() {
 		Parameters.setClassAttribute(false);
 		Parameters.setInstanceName(false);
-		datapoint.setNumberOfDimensions(2);
+		DataPoint.setNumberOfDimensions(2);
 		assertEquals("1.0;2.0;;Source:;1.0;2.0;", datapoint.toString());
 		Parameters.setClassAttribute(true);
 		Parameters.setInstanceName(true);

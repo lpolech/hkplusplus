@@ -3,16 +3,12 @@ package test.distance.measures;
 import static org.junit.Assert.*;
 
 import java.awt.Color;
-import java.util.HashMap;
-
 import org.junit.Test;
 
 import Jama.Matrix;
-import algorithms.EM;
 import data.Cluster;
 import data.DataPoint;
 import data.Parameters;
-import distance.measures.GMMBayesMLE;
 import distance.measures.L2Norm;
 
 public class TestL2Norm {

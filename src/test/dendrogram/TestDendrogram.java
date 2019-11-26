@@ -13,7 +13,6 @@ import data.Parameters;
 import dendrogram.Dendrogram;
 import dendrogram.DendrogramLevel;
 import utils.CmdLineParser;
-import utils.Utils;
 
 public class TestDendrogram {
 	String[] args = new String[]{

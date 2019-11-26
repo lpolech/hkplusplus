@@ -9,7 +9,6 @@ import org.junit.Test;
 import data.DataNormalisation;
 import data.DataPoint;
 import data.DataStatistics;
-import data.NumberOfPointsAndDataDimension;
 import data.Parameters;
 
 public class TestDataNormalisation {

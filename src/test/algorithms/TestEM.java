@@ -9,13 +9,11 @@ import org.junit.Test;
 
 import Jama.Matrix;
 import algorithms.EM;
-import algorithms.Kmeans;
 import data.Cluster;
 import data.ClustersAndTheirStatistics;
 import data.Data;
 import data.DataPoint;
 import data.DataStatistics;
-import data.NumberOfPointsAndDataDimension;
 import data.Parameters;
 import distance.measures.L2Norm;
 

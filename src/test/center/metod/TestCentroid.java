@@ -9,11 +9,11 @@ import org.junit.Test;
 import center.method.Centroid;
 import data.Cluster;
 import data.Data;
+import data.DataPoint;
 import data.DataReader;
 import data.Parameters;
 import distance.measures.GMMBayesMLE;
 import distance.measures.L2Norm;
-import distance.measures.LOG_GMMBayesMLE;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class TestCentroid {
@@ -35,7 +35,8 @@ public class TestCentroid {
 		cluster = centroid.makeCluster(inputData, new L2Norm());
 		assertEquals(0.5, cluster.getCenter().getCoordinate(0),Parameters.getEpsilon());
 		assertEquals(0.5, cluster.getCenter().getCoordinate(1),Parameters.getEpsilon());
-		assertEquals(2, cluster.getCenter().getNumberOfDimensions());
+		cluster.getCenter();
+		assertEquals(2, DataPoint.getNumberOfDimensions());
 	}
 
 	@Test

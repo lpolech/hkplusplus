@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
-import data.Data;
 import data.DataStatistics;
 import data.Parameters;
 

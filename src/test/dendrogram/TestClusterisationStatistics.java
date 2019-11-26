@@ -12,7 +12,6 @@ import data.Cluster;
 import data.Data;
 import data.DataPoint;
 import data.DataStatistics;
-import data.NumberOfPointsAndDataDimension;
 import data.Parameters;
 import dendrogram.ClusterisationStatistics;
 import dendrogram.DendrogramLevel;
