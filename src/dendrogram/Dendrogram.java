@@ -218,6 +218,28 @@ public class Dendrogram {
 		return dendrogram;
 	}
 
+	public Hierarchy calculateHierachy() {
+		Utils.startTimer();
+
+		int levelNumber = 1;// 0 - root is created in the constructor
+		while (!shouldTerminate(levelNumber)) {
+			System.out.println("Working on level " + levelNumber + "... ");
+			DendrogramLevel newLevel = getDendrogramBottom().expandTree(k, levelNumber, points.getDataStats(),
+					currentNumberOfNodes);
+			dendrogram.add(newLevel);
+			computeDendrogramStatistics(newLevel);
+			levelNumber++;
+			System.out.println("Done.");
+		}
+		Utils.stopTimer();
+		System.out.println("Method time: " + Utils.getTimerReport());
+		System.out.println("Computing final statistics... ");
+		Hierarchy h = getHierarchyRepresentation();
+
+		System.out.println("Done.");
+		return h;
+	}
+
 	private void saveFinalHierarchyOfGroups(Hierarchy h) {
 		if (h == null) {
 			h = this.getHierarchyRepresentation();
