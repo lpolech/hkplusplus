@@ -4,6 +4,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="submodules/hierarchy_measures/src"/>
 	<classpathentry kind="src" path="submodules/hierarchy_measures/submodules/basic_hierarchy/src"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="libs/commons-cli-1.2.jar"/>
 	<classpathentry kind="lib" path="libs/Jama-1.0.3.jar"/>
 	<classpathentry kind="lib" path="submodules/hierarchy_measures/libs/hamcrest-core-1.3.jar"/>
